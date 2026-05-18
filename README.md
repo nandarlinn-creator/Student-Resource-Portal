@@ -68,9 +68,22 @@ pm2 start server.js --name student-portal
 pm2 startup && pm2 save
 ```
 
-### RDS Security Group Rule
+### RDS Configuration
 Allow EC2's security group to reach RDS on **port 3306**.
 Never expose RDS publicly.
+```bash
+# Create Database in the rds instance.
+sudo apt install mysql-client -y
+mysql -h database-alinn.ch2mgk8swzny.ap-southeast-1.rds.amazonaws.com -u nandar15303 -p
+# Enter Password
+CREATE DATABASE `database-alinn`;
+SHOW DATABASES;   -- confirm it appears
+EXIT;
+
+#Verify the DB connection
+pm2 restart student-portal
+pm2 logs student-portal --lines 20
+```
 
 ### HTTPS (strongly recommended)
 Use **Nginx as a reverse proxy** in front of Node + **Certbot** for free TLS:
