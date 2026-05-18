@@ -55,6 +55,7 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 # Clone app
 git clone https://github.com/nandarlinn-creator/Student-Resource-Portal /home/ubuntu/student-portal
 cd /home/ec2-user/student-portal
+sudo apt install npm
 npm install --production
 
 # Set env vars (use AWS Secrets Manager or Parameter Store in production)
