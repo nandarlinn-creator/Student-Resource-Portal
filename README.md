@@ -48,12 +48,12 @@ student-portal/
 
 ```bash
 # On EC2 — install Node.js 20
-# sudo apt-get update    # Ubuntu
-  sudo apt-get install -y nodejs
+sudo apt-get update    # Ubuntu
+sudo apt-get install -y nodejs
 # generate SESSION-SECRET and update in .env.example 
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 # Clone app
-git clone <repo-url> /home/ec2-user/student-portal
+git clone https://github.com/nandarlinn-creator/Student-Resource-Portal /home/ubuntu/student-portal
 cd /home/ec2-user/student-portal
 npm install --production
 
