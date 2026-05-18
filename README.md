@@ -1,5 +1,3 @@
-# Student-Resource-Portal
- full Node.js/Express boilerplate for your Student Resource Portal — with a clean directory structure, secure DB connection, and routing for Login and Project Upload.
 # 🎓 Student Resource Portal
 
 Node.js / Express application for university resource sharing, deployed on AWS EC2 with RDS MySQL.
