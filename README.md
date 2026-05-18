@@ -66,7 +66,8 @@ npm run dev
 # On EC2 — install Node.js 20
 curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
 sudo yum install -y nodejs   # Amazon Linux
-# OR: sudo apt-get install -y nodejs   # Ubuntu
+# OR: sudo apt-get update    # Ubuntu
+      sudo apt-get install -y nodejs   
 
 # Clone app
 git clone <repo-url> /home/ec2-user/student-portal
