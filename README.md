@@ -34,22 +34,6 @@ student-portal/
 └── server.js                # Entry point
 ```
 
----
-
-## Local Setup
-
-```bash
-# 1. Clone and install
-git clone <repo-url> && cd student-portal
-npm install
-
-# 2. Configure environment
-cp .env.example .env
-# Edit .env — fill in your RDS credentials and SESSION_SECRET
-
-# 3. Run (development)
-npm run dev
-```
 
 ---
 
@@ -64,11 +48,10 @@ npm run dev
 
 ```bash
 # On EC2 — install Node.js 20
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo yum install -y nodejs   # Amazon Linux
-# OR: sudo apt-get update    # Ubuntu
-      sudo apt-get install -y nodejs   
-
+# sudo apt-get update    # Ubuntu
+  sudo apt-get install -y nodejs
+# generate SESSION-SECRET and update in .env.example 
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 # Clone app
 git clone <repo-url> /home/ec2-user/student-portal
 cd /home/ec2-user/student-portal
