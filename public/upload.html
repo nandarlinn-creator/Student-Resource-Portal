@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Project — Student Resource Portal</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .main-wrap {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 69px);
+    }
+
+    /* ── Sidebar ── */
+    aside {
+      border-right: 1px solid var(--border);
+      padding: 32px 20px;
+      background: var(--card);
+    }
+
+    .sidebar-section { margin-bottom: 32px; }
+
+    .sidebar-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-link:hover { background: var(--border); color: var(--text); }
+    .sidebar-link.active { background: rgba(59,130,246,0.12); color: var(--accent); }
+
+    .sidebar-link .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    /* ── Content ── */
+    .content {
+      padding: 48px;
+      overflow-y: auto;
+    }
+
+    .page-header { margin-bottom: 40px; }
+
+    .page-header h1 {
+      font-family: var(--font-head);
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .page-header p { color: var(--muted); font-size: 0.95rem; }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── Drop Zone ── */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: var(--bg2);
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(59,130,246,0.05);
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    .drop-title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .drop-sub { font-size: 0.82rem; color: var(--muted); }
+    .drop-sub span { color: var(--accent); font-weight: 500; }
+
+    .file-types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .file-type-tag {
+      background: var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Selected File ── */
+    .file-preview {
+      display: none;
+      align-items: center;
+      gap: 14px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+    }
+
+    .file-preview.show { display: flex; }
+
+    .file-preview-icon { font-size: 1.8rem; }
+
+    .file-preview-info { flex: 1; }
+    .file-preview-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 2px; }
+    .file-preview-size { font-size: 0.78rem; color: var(--muted); }
+
+    .file-remove {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 1.1rem; padding: 4px;
+      transition: color 0.2s;
+    }
+    .file-remove:hover { color: var(--danger); }
+
+    /* ── Progress ── */
+    .progress-wrap { display: none; margin-bottom: 20px; }
+    .progress-wrap.show { display: block; }
+
+    .progress-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .progress-label { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── Info Panel ── */
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .info-card h3 {
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+    }
+
+    .info-item-icon { font-size: 1rem; margin-top: 1px; }
+    .info-item-text { color: var(--muted); line-height: 1.5; }
+    .info-item-text strong { color: var(--text); font-weight: 500; }
+
+    @media (max-width: 1024px) {
+      .upload-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .main-wrap { grid-template-columns: 1fr; }
+      aside { display: none; }
+      .content { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="page-wrap">
+    <nav>
+      <a href="/" class="nav-logo">
+        <span></span>UniPortal
+      </a>
+      <div class="nav-links">
+        <a href="/projects">Browse Projects</a>
+        <button class="btn-nav-primary" onclick="logout()">Sign Out</button>
+      </div>
+    </nav>
+
+    <div class="main-wrap">
+      <!-- Sidebar -->
+      <aside>
+        <div class="sidebar-section">
+          <p class="sidebar-label">Navigation</p>
+          <a href="/projects" class="sidebar-link">
+            <span class="icon">📁</span> All Projects
+          </a>
+          <a href="/projects/upload" class="sidebar-link active">
+            <span class="icon">⬆️</span> Upload Project
+          </a>
+        </div>
+        <div class="sidebar-section">
+          <p class="sidebar-label">Account</p>
+          <a href="#" class="sidebar-link">
+            <span class="icon">👤</span> My Profile
+          </a>
+          <a href="#" class="sidebar-link" onclick="logout(); return false;">
+            <span class="icon">🚪</span> Sign Out
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="content">
+        <div class="page-header fade-up">
+          <h1>Upload Project</h1>
+          <p>Share your work with the university community. All uploads are reviewed before publishing.</p>
+        </div>
+
+        <div class="alert alert-error" id="errorAlert">
+          <span>⚠</span><span id="errorMsg">Something went wrong.</span>
+        </div>
+        <div class="alert alert-success" id="successAlert">
+          <span>✓</span><span id="successMsg">Project submitted successfully! Pending review.</span>
+        </div>
+
+        <div class="upload-grid">
+          <div class="fade-up delay-1">
+            <!-- Drop Zone -->
+            <div class="drop-zone" id="dropZone">
+              <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.txt,.png,.jpg,.jpeg"
+                onchange="handleFileSelect(this)" />
+              <div class="drop-icon">📂</div>
+              <p class="drop-title">Drop your file here</p>
+              <p class="drop-sub">or <span>browse to upload</span></p>
+              <div class="file-types">
+                <span class="file-type-tag">PDF</span>
+                <span class="file-type-tag">DOCX</span>
+                <span class="file-type-tag">PPTX</span>
+                <span class="file-type-tag">ZIP</span>
+                <span class="file-type-tag">TXT</span>
+                <span class="file-type-tag">PNG/JPG</span>
+              </div>
+            </div>
+
+            <!-- File Preview -->
+            <div class="file-preview" id="filePreview">
+              <div class="file-preview-icon" id="fileIcon">📄</div>
+              <div class="file-preview-info">
+                <div class="file-preview-name" id="fileName">—</div>
+                <div class="file-preview-size" id="fileSize">—</div>
+              </div>
+              <button class="file-remove" onclick="removeFile()">✕</button>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-wrap" id="progressWrap">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressFill"></div>
+              </div>
+              <p class="progress-label" id="progressLabel">Uploading...</p>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-group">
+              <label for="title">Project Title *</label>
+              <input type="text" id="title" placeholder="e.g. Machine Learning for Climate Data" maxlength="200" required />
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea id="description" placeholder="Briefly describe your project, its goals and findings..." maxlength="2000"></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="uploadBtn" onclick="handleUpload()">
+              <span class="spinner"></span>
+              <span class="btn-text">Submit Project</span>
+            </button>
+          </div>
+
+          <!-- Info Panel -->
+          <div class="info-card fade-up delay-2">
+            <h3>📋 Submission Guidelines</h3>
+            <div class="info-item">
+              <span class="info-item-icon">📏</span>
+              <p class="info-item-text"><strong>Max file size:</strong> 20 MB per upload.</p>
+            </div>
+            <div class="info-item">
+              <span class="info-item-icon">📂</span>
+              <p class="info-item-text"><strong>Formats accepted:</strong> PDF, DOCX, PPTX, ZIP, TXT, PNG, JPG.</p>
+            </div>
+            <div class="info-item">
+              <span class="info-item-icon">🔍</span>
+              <p class="info-item-text"><strong>Review process:</strong> All projects are reviewed by faculty before appearing publicly.</p>
+            </div>
+            <div class="info-item">
+              <span class="info-item-icon">⚖️</span>
+              <p class="info-item-text"><strong>Academic integrity:</strong> Only submit original work. Plagiarism will result in removal.</p>
+            </div>
+            <div class="info-item">
+              <span class="info-item-icon">📧</span>
+              <p class="info-item-text"><strong>Notification:</strong> You'll receive a confirmation once your project is reviewed.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/upload.js"></script>
+</body>
+</html>

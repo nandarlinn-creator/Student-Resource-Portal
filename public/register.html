@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — Student Resource Portal</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .auth-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+    }
+
+    .register-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+    }
+
+    .auth-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+
+    .auth-title {
+      font-family: var(--font-head);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      line-height: 1.15;
+    }
+
+    .auth-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 36px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 48px; }
+    .toggle-pw {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; color: var(--muted);
+      padding: 4px; font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+    .toggle-pw:hover { color: var(--text); }
+
+    /* Password strength */
+    .pw-strength {
+      margin-top: 8px;
+      display: flex;
+      gap: 4px;
+    }
+    .pw-bar {
+      flex: 1; height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      transition: background 0.3s;
+    }
+    .pw-bar.weak   { background: var(--danger); }
+    .pw-bar.medium { background: var(--warning); }
+    .pw-bar.strong { background: var(--success); }
+    .pw-hint { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+
+    .role-select { appearance: none; cursor: pointer; }
+
+    .terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .terms input[type="checkbox"] {
+      width: 16px; height: 16px;
+      min-width: 16px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+    }
+    .terms a { color: var(--accent); text-decoration: none; }
+
+    .login-cta {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+    .login-cta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+    @media (max-width: 560px) {
+      .two-col { grid-template-columns: 1fr; }
+      .register-card { padding: 32px 24px; }
+      .auth-title { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="page-wrap">
+    <nav>
+      <a href="/" class="nav-logo">
+        <span></span>UniPortal
+      </a>
+      <div class="nav-links">
+        <a href="/auth/login">Sign In</a>
+      </div>
+    </nav>
+
+    <div class="auth-wrap">
+      <div class="register-card fade-up">
+        <p class="auth-eyebrow">Create account</p>
+        <h1 class="auth-title">Join the Portal</h1>
+        <p class="auth-sub">Start sharing and discovering university projects.</p>
+
+        <div class="alert alert-error" id="errorAlert">
+          <span>⚠</span><span id="errorMsg">Something went wrong.</span>
+        </div>
+        <div class="alert alert-success" id="successAlert">
+          <span>✓</span><span>Account created! Redirecting...</span>
+        </div>
+
+        <div class="two-col">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Jane Smith" autocomplete="name" required />
+          </div>
+          <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" class="role-select">
+              <option value="student">Student</option>
+              <option value="faculty">Faculty</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">University Email</label>
+          <input type="email" id="email" placeholder="you@university.edu" autocomplete="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password"
+              oninput="checkStrength(this.value)" required />
+            <button type="button" class="toggle-pw" onclick="togglePassword('password', this)">👁</button>
+          </div>
+          <div class="pw-strength">
+            <div class="pw-bar" id="bar1"></div>
+            <div class="pw-bar" id="bar2"></div>
+            <div class="pw-bar" id="bar3"></div>
+          </div>
+          <p class="pw-hint" id="pwHint">Use 8+ characters with uppercase and a number.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="password-wrap">
+            <input type="password" id="confirmPassword" placeholder="Repeat password" autocomplete="new-password" required />
+            <button type="button" class="toggle-pw" onclick="togglePassword('confirmPassword', this)">👁</button>
+          </div>
+        </div>
+
+        <div class="terms">
+          <input type="checkbox" id="terms" />
+          <label for="terms" style="text-transform:none;font-size:0.85rem;letter-spacing:0;">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </label>
+        </div>
+
+        <button class="btn btn-primary" id="registerBtn" onclick="handleRegister()">
+          <span class="spinner"></span>
+          <span class="btn-text">Create Account</span>
+        </button>
+
+        <p class="login-cta">Already have an account? <a href="/auth/login">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>

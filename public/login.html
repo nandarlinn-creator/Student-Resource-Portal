@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Student Resource Portal</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .auth-wrap {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 69px);
+    }
+
+    /* ── Left panel ── */
+    .auth-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px;
+      border-right: 1px solid var(--border);
+    }
+
+    .auth-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .auth-title {
+      font-family: var(--font-head);
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .auth-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .auth-form { max-width: 380px; }
+
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 48px; }
+    .toggle-pw {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; color: var(--muted);
+      padding: 4px; font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+    .toggle-pw:hover { color: var(--text); }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      margin-top: -12px;
+      margin-bottom: 20px;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--accent); }
+
+    .register-cta {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+    .register-cta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .register-cta a:hover { text-decoration: underline; }
+
+    /* ── Right panel ── */
+    .auth-visual {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+      background: var(--card);
+      gap: 32px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .stat-card .num {
+      font-family: var(--font-head);
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-card .lbl {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .visual-quote {
+      max-width: 340px;
+      text-align: center;
+    }
+
+    .visual-quote blockquote {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .visual-quote cite {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: normal;
+    }
+
+    @media (max-width: 768px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+      .auth-visual { display: none; }
+      .auth-panel { padding: 40px 24px; }
+      .auth-title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="page-wrap">
+    <nav>
+      <a href="/" class="nav-logo">
+        <span></span>UniPortal
+      </a>
+      <div class="nav-links">
+        <a href="/auth/register" class="btn-nav-primary">Register</a>
+      </div>
+    </nav>
+
+    <div class="auth-wrap">
+      <!-- Form Panel -->
+      <div class="auth-panel">
+        <div class="auth-form fade-up">
+          <p class="auth-eyebrow">Welcome back</p>
+          <h1 class="auth-title">Sign in to<br>your portal</h1>
+          <p class="auth-sub">Access your projects, resources, and university tools.</p>
+
+          <div class="alert alert-error" id="errorAlert">
+            <span>⚠</span><span id="errorMsg">Invalid email or password.</span>
+          </div>
+
+          <div class="form-group delay-1 fade-up">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="you@university.edu" autocomplete="email" required />
+          </div>
+
+          <div class="form-group delay-2 fade-up">
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+              <button type="button" class="toggle-pw" onclick="togglePassword('password', this)">👁</button>
+            </div>
+          </div>
+
+          <a href="#" class="forgot-link">Forgot password?</a>
+
+          <button class="btn btn-primary delay-3 fade-up" id="loginBtn" onclick="handleLogin()">
+            <span class="spinner"></span>
+            <span class="btn-text">Sign In</span>
+          </button>
+
+          <p class="register-cta">
+            Don't have an account? <a href="/auth/register">Create one</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Visual Panel -->
+      <div class="auth-visual">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="num">2.4k</div>
+            <div class="lbl">Projects Uploaded</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">840</div>
+            <div class="lbl">Active Students</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">120</div>
+            <div class="lbl">Faculty Members</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">98%</div>
+            <div class="lbl">Uptime</div>
+          </div>
+        </div>
+        <div class="visual-quote">
+          <blockquote>"Knowledge shared is knowledge multiplied."</blockquote>
+          <cite>— University Resource Portal</cite>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>
