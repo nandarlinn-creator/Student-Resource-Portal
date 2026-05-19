@@ -17,6 +17,19 @@ const Project = sequelize.define("Project", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  readme: {
+    type: DataTypes.LONGTEXT,   // full markdown content
+    allowNull: true,
+  },
+  requirements: {
+    type: DataTypes.JSON,       // { software:{}, hardware:[], networking:[] }
+    allowNull: true,
+  },
+  images: {
+    type: DataTypes.JSON,       // array of saved image filenames
+    allowNull: true,
+    defaultValue: [],
+  },
   file_path: {
     type: DataTypes.STRING(500),
     allowNull: false,
@@ -26,7 +39,7 @@ const Project = sequelize.define("Project", {
     allowNull: false,
   },
   file_size: {
-    type: DataTypes.INTEGER.UNSIGNED, // bytes
+    type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
   },
   mime_type: {
@@ -39,7 +52,6 @@ const Project = sequelize.define("Project", {
   },
 });
 
-// ─── Associations ──────────────────────────────────────────────
 Project.belongsTo(User, { foreignKey: "user_id", as: "uploader" });
 User.hasMany(Project, { foreignKey: "user_id", as: "projects" });
 
