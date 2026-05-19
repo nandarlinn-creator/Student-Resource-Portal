@@ -30,20 +30,32 @@ exports.postUpload = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  if (!req.file) {
+  // project_file is now optional (README.txt blob from frontend)
+  const projectFile = req.files?.project_file?.[0];
+  if (!projectFile) {
     return res.status(400).json({ error: "A project file is required." });
   }
 
-  const { title, description } = req.body;
+  // Collect uploaded image paths
+  const images = [];
+  for (let i = 0; i < 15; i++) {
+    const imgFile = req.files?.[`image_${i}`]?.[0];
+    if (imgFile) images.push(`/uploads/images/${imgFile.filename}`);
+  }
+
+  const { title, description, readme, requirements } = req.body;
 
   try {
     const project = await Project.create({
       title,
       description: description || null,
-      file_path: req.file.path,
-      file_name: req.file.originalname,
-      file_size: req.file.size,
-      mime_type: req.file.mimetype,
+      readme: readme || null,
+      requirements: requirements ? JSON.parse(requirements) : null,
+      images,
+      file_path: projectFile.path,
+      file_name: projectFile.originalname,
+      file_size: projectFile.size,
+      mime_type: projectFile.mimetype,
       user_id: req.session.userId,
     });
 
