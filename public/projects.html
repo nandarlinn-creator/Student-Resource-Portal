@@ -408,7 +408,8 @@
 
     async function loadProjects() {
       try {
-        const res  = await fetch('/projects');
+        const res  = await fetch('/projects', {
+  headers: { 'Accept': 'application/json' };
         const data = await res.json();
         allProjects = data.projects || [];
         renderProjects(allProjects);
