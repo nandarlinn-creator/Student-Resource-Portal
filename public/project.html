@@ -6,200 +6,93 @@
   <title>Project — Student Resource Portal</title>
   <link rel="stylesheet" href="/css/style.css" />
   <style>
-    .main-wrap {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      min-height: calc(100vh - 69px);
-    }
-    aside {
-      border-right: 1px solid var(--border);
-      padding: 28px 16px;
-      background: var(--card);
-      position: sticky; top: 69px;
-      height: calc(100vh - 69px); overflow-y: auto;
-    }
-    .sidebar-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 0 12px; margin-bottom: 8px; }
-    .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: var(--muted); font-size: 0.88rem; transition: all 0.2s; margin-bottom: 2px; }
-    .sidebar-link:hover { background: var(--border); color: var(--text); }
-    .sidebar-link.active { background: rgba(59,130,246,0.12); color: var(--accent); }
-
-    .content { padding: 48px; max-width: 980px; }
-
-    /* ── Back link ── */
-    .back-link {
-      display: inline-flex; align-items: center; gap: 6px;
-      color: var(--muted); text-decoration: none; font-size: 0.85rem;
-      margin-bottom: 28px; transition: color 0.2s;
-    }
-    .back-link:hover { color: var(--text); }
-
-    /* ── Hero ── */
-    .project-hero {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 32px; margin-bottom: 28px;
-    }
-    .hero-top {
-      display: flex; align-items: flex-start;
-      justify-content: space-between; gap: 16px; margin-bottom: 20px;
-    }
-    .hero-title {
-      font-family: var(--font-head); font-size: 2rem;
-      font-weight: 800; letter-spacing: -0.02em; line-height: 1.15;
-    }
-    .hero-meta {
-      display: flex; align-items: center; gap: 16px;
-      flex-wrap: wrap; font-size: 0.82rem; color: var(--muted);
-    }
-    .hero-meta-item { display: flex; align-items: center; gap: 6px; }
-    .author-avatar {
-      width: 24px; height: 24px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.62rem; font-weight: 700; color: #fff;
-    }
-
-    /* ── Tabs ── */
-    .detail-tabs {
-      display: flex; gap: 4px;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 4px;
-      margin-bottom: 24px; width: fit-content;
-    }
-    .detail-tab {
-      padding: 8px 20px; border-radius: 7px; border: none;
-      background: none; color: var(--muted); font-size: 0.88rem;
-      font-weight: 500; cursor: pointer; transition: all 0.2s;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .detail-tab:hover { color: var(--text); }
-    .detail-tab.active { background: var(--bg); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-
-    /* ── Tab panels ── */
-    .tab-panel { display: none; animation: fadeUp 0.3s ease; }
-    .tab-panel.active { display: block; }
-
-    /* ── Section card ── */
-    .section-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 20px; }
-    .section-title {
-      font-family: var(--font-head); font-size: 1rem; font-weight: 700;
-      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
-      padding-bottom: 14px; border-bottom: 1px solid var(--border);
-    }
-
-    /* ── Image gallery ── */
-    .gallery-grid {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
-    }
-    .gallery-img {
-      aspect-ratio: 16/10; border-radius: 10px; overflow: hidden;
-      background: var(--bg2); border: 1px solid var(--border);
-      cursor: pointer; transition: all 0.2s;
-    }
-    .gallery-img:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-    .gallery-img img { width: 100%; height: 100%; object-fit: cover; }
-    .gallery-empty { text-align: center; padding: 40px; color: var(--muted); font-size: 0.85rem; }
-
-    /* ── Lightbox ── */
-    .lightbox {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-      display: none; align-items: center; justify-content: center;
-      z-index: 1000; padding: 20px;
-    }
-    .lightbox.open { display: flex; }
-    .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; object-fit: contain; }
-    .lightbox-close {
-      position: absolute; top: 20px; right: 24px;
-      background: none; border: none; color: #fff; font-size: 2rem;
-      cursor: pointer; line-height: 1;
-    }
-
-    /* ── Requirements ── */
-    .req-section { margin-bottom: 28px; }
-    .req-section:last-child { margin-bottom: 0; }
-    .req-section-title {
-      font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px;
-      display: flex; align-items: center; gap: 6px;
-    }
-
-    /* Software tags */
-    .tag-group { margin-bottom: 14px; }
-    .tag-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
-    .req-tag {
-      padding: 4px 12px; border-radius: 99px; font-size: 0.8rem; font-weight: 500;
-    }
-    .req-tag.lang  { background: rgba(59,130,246,0.15); color: var(--accent); }
-    .req-tag.fw    { background: rgba(6,182,212,0.15);  color: var(--accent2); }
-    .req-tag.db    { background: rgba(16,185,129,0.15); color: var(--success); }
-    .req-tag.other { background: rgba(245,158,11,0.15); color: var(--warning); }
-
-    /* Hardware/Networking table */
-    .req-table { width: 100%; border-collapse: collapse; }
-    .req-table th {
-      text-align: left; padding: 8px 14px;
-      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--muted);
-      background: var(--bg2); border-bottom: 1px solid var(--border);
-    }
-    .req-table th:first-child { border-radius: 8px 0 0 0; }
-    .req-table th:last-child  { border-radius: 0 8px 0 0; }
-    .req-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.86rem; }
-    .req-table tr:last-child td { border-bottom: none; }
-    .req-table tr:hover td { background: rgba(255,255,255,0.02); }
-    .cat-badge {
-      display: inline-block; padding: 2px 8px; border-radius: 6px;
-      font-size: 0.72rem; font-weight: 600;
-      background: var(--border); color: var(--muted);
-    }
-    .empty-req { color: var(--muted); font-size: 0.85rem; font-style: italic; }
-
-    /* ── README ── */
-    .readme-body {
-      font-size: 0.9rem; line-height: 1.8; color: var(--text);
-    }
-    .readme-body h1 { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; margin: 24px 0 10px; letter-spacing: -0.01em; }
-    .readme-body h2 { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; margin: 20px 0 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-    .readme-body h3 { font-family: var(--font-head); font-size: 1rem;  font-weight: 700; margin: 16px 0 6px; }
-    .readme-body p  { margin-bottom: 12px; }
-    .readme-body code { background: var(--border); padding: 2px 7px; border-radius: 5px; font-size: 0.84em; font-family: 'Courier New', monospace; }
-    .readme-body pre { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; overflow-x: auto; margin: 14px 0; }
-    .readme-body pre code { background: none; padding: 0; font-size: 0.85rem; }
-    .readme-body ul, .readme-body ol { padding-left: 22px; margin-bottom: 12px; }
-    .readme-body li { margin-bottom: 4px; }
-    .readme-body strong { font-weight: 600; }
-    .readme-body blockquote { border-left: 3px solid var(--accent); padding-left: 16px; color: var(--muted); margin: 12px 0; font-style: italic; }
-    .readme-body hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-    .readme-empty { text-align: center; padding: 48px; color: var(--muted); font-size: 0.88rem; }
-
-    /* ── Loading / Error ── */
-    .loading-state { text-align: center; padding: 80px; color: var(--muted); }
-    .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 768px) {
-      .main-wrap { grid-template-columns: 1fr; }
-      aside { display: none; }
-      .content { padding: 24px 16px; }
-      .gallery-grid { grid-template-columns: 1fr 1fr; }
-      .hero-title { font-size: 1.5rem; }
+    .main-wrap { flex:1; display:grid; grid-template-columns:240px 1fr; min-height:calc(100vh - 69px); }
+    aside { border-right:1px solid var(--border); padding:28px 16px; background:var(--card); position:sticky; top:69px; height:calc(100vh - 69px); overflow-y:auto; }
+    .sidebar-label { font-size:0.7rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:0 12px; margin-bottom:8px; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; text-decoration:none; color:var(--muted); font-size:0.88rem; transition:all 0.2s; margin-bottom:2px; }
+    .sidebar-link:hover { background:var(--border); color:var(--text); }
+    .sidebar-link.active { background:rgba(59,130,246,0.12); color:var(--accent); }
+    .content { padding:48px; max-width:980px; }
+    .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:0.85rem; margin-bottom:28px; transition:color 0.2s; }
+    .back-link:hover { color:var(--text); }
+    .project-hero { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; margin-bottom:28px; }
+    .hero-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
+    .hero-title { font-family:var(--font-head); font-size:2rem; font-weight:800; letter-spacing:-0.02em; line-height:1.15; }
+    .hero-meta { display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-size:0.82rem; color:var(--muted); margin-bottom:20px; }
+    .hero-meta-item { display:flex; align-items:center; gap:6px; }
+    .author-avatar { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:0.62rem; font-weight:700; color:#fff; }
+    .download-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; font-size:0.9rem; font-weight:600; text-decoration:none; transition:all 0.2s; }
+    .download-btn:hover { opacity:0.85; transform:translateY(-1px); box-shadow:0 6px 20px rgba(59,130,246,0.3); }
+    .hero-footer { padding-top:20px; border-top:1px solid var(--border); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .detail-tabs { display:flex; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:4px; margin-bottom:24px; width:fit-content; }
+    .detail-tab { padding:8px 20px; border-radius:7px; border:none; background:none; color:var(--muted); font-size:0.88rem; font-weight:500; cursor:pointer; transition:all 0.2s; }
+    .detail-tab:hover { color:var(--text); }
+    .detail-tab.active { background:var(--bg); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+    .tab-panel { display:none; animation:fadeUp 0.3s ease; }
+    .tab-panel.active { display:block; }
+    .section-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:28px; margin-bottom:20px; }
+    .section-title { font-family:var(--font-head); font-size:1rem; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:8px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+    .gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .gallery-img { aspect-ratio:16/10; border-radius:10px; overflow:hidden; background:var(--bg2); border:1px solid var(--border); cursor:pointer; transition:all 0.2s; }
+    .gallery-img:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+    .gallery-img img { width:100%; height:100%; object-fit:cover; }
+    .gallery-empty { text-align:center; padding:40px; color:var(--muted); font-size:0.85rem; }
+    .lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+    .lightbox.open { display:flex; }
+    .lightbox img { max-width:90vw; max-height:90vh; border-radius:8px; object-fit:contain; }
+    .lightbox-close { position:absolute; top:20px; right:24px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer; }
+    .tag-group { margin-bottom:14px; }
+    .tag-label { font-size:0.72rem; color:var(--muted); margin-bottom:6px; font-weight:500; }
+    .tag-list { display:flex; flex-wrap:wrap; gap:6px; }
+    .req-tag { padding:4px 12px; border-radius:99px; font-size:0.8rem; font-weight:500; }
+    .req-tag.lang  { background:rgba(59,130,246,0.15); color:var(--accent); }
+    .req-tag.fw    { background:rgba(6,182,212,0.15);  color:var(--accent2); }
+    .req-tag.db    { background:rgba(16,185,129,0.15); color:var(--success); }
+    .req-tag.other { background:rgba(245,158,11,0.15); color:var(--warning); }
+    .req-table { width:100%; border-collapse:collapse; }
+    .req-table th { text-align:left; padding:8px 14px; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); background:var(--bg2); border-bottom:1px solid var(--border); }
+    .req-table td { padding:10px 14px; border-bottom:1px solid var(--border); font-size:0.86rem; }
+    .req-table tr:last-child td { border-bottom:none; }
+    .req-table tr:hover td { background:rgba(255,255,255,0.02); }
+    .cat-badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:0.72rem; font-weight:600; background:var(--border); color:var(--muted); }
+    .empty-req { color:var(--muted); font-size:0.85rem; font-style:italic; }
+    .readme-body { font-size:0.9rem; line-height:1.8; color:var(--text); }
+    .readme-body h1 { font-family:var(--font-head); font-size:1.6rem; font-weight:800; margin:24px 0 10px; }
+    .readme-body h2 { font-family:var(--font-head); font-size:1.2rem; font-weight:700; margin:20px 0 8px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+    .readme-body h3 { font-family:var(--font-head); font-size:1rem; font-weight:700; margin:16px 0 6px; }
+    .readme-body p  { margin-bottom:12px; }
+    .readme-body code { background:var(--border); padding:2px 7px; border-radius:5px; font-size:0.84em; font-family:'Courier New',monospace; }
+    .readme-body pre { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:18px; overflow-x:auto; margin:14px 0; }
+    .readme-body pre code { background:none; padding:0; font-size:0.85rem; }
+    .readme-body ul,.readme-body ol { padding-left:22px; margin-bottom:12px; }
+    .readme-body li { margin-bottom:4px; }
+    .readme-body strong { font-weight:600; }
+    .readme-body blockquote { border-left:3px solid var(--accent); padding-left:16px; color:var(--muted); margin:12px 0; font-style:italic; }
+    .readme-body hr { border:none; border-top:1px solid var(--border); margin:20px 0; }
+    .readme-empty { text-align:center; padding:48px; color:var(--muted); font-size:0.88rem; }
+    .loading-state { text-align:center; padding:80px; color:var(--muted); }
+    .loading-spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @media (max-width:768px) {
+      .main-wrap { grid-template-columns:1fr; }
+      aside { display:none; }
+      .content { padding:24px 16px; }
+      .gallery-grid { grid-template-columns:1fr 1fr; }
+      .hero-title { font-size:1.5rem; }
     }
   </style>
 </head>
 <body>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
-
   <div class="page-wrap">
     <nav>
       <a href="/" class="nav-logo"><span></span>UniPortal</a>
       <div class="nav-links">
-        <a href="/projects/upload">⬆ Upload</a>
+        <a href="/projects/upload">Upload</a>
         <button class="btn-nav-primary" onclick="logout()">Sign Out</button>
       </div>
     </nav>
-
     <div class="main-wrap">
       <aside>
         <div style="margin-bottom:28px;">
@@ -212,7 +105,6 @@
           <a href="#" class="sidebar-link" onclick="logout();return false;"><span>🚪</span> Sign Out</a>
         </div>
       </aside>
-
       <main class="content" id="mainContent">
         <div class="loading-state">
           <div class="loading-spinner"></div>
@@ -222,164 +114,130 @@
     </div>
   </div>
 
-  <!-- Lightbox -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <button class="lightbox-close" onclick="closeLightbox()">x</button>
     <img id="lightboxImg" src="" alt="" onclick="event.stopPropagation()" />
   </div>
 
   <script>
-  /* ── Get project ID from URL ── */
   const projectId = window.location.pathname.split('/').filter(Boolean).pop();
 
   async function loadProject() {
     try {
-      const res  = await fetch(`/projects/${projectId}`, { headers: { 'Accept': 'application/json' } });
+      const res  = await fetch('/projects/' + projectId, { headers: { 'Accept': 'application/json' } });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Not found');
       renderProject(data.project);
     } catch(err) {
-      document.getElementById('mainContent').innerHTML = `
-        <a href="/projects" class="back-link">← Back to Projects</a>
-        <div class="loading-state"><p>❌ ${err.message}</p></div>`;
+      document.getElementById('mainContent').innerHTML =
+        '<a href="/projects" class="back-link">Back to Projects</a>' +
+        '<div class="loading-state"><p>Error: ' + err.message + '</p></div>';
     }
   }
 
   function renderProject(p) {
-    const author  = p.uploader?.name || 'Unknown';
-    const date    = new Date(p.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-    const av      = (author).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    const req     = p.requirements || {};
-    const sw      = req.software   || {};
-    const hw      = req.hardware   || [];
-    const net     = req.networking || [];
-    const images  = p.images       || [];
+    const author = p.uploader ? p.uploader.name : 'Unknown';
+    const rawDate = p.created_at || p.createdAt;
+    const date = rawDate ? new Date(rawDate).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : 'Unknown date';
+    const av   = author.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+    const req  = p.requirements || {};
+    const sw   = req.software   || {};
+    const hw   = req.hardware   || [];
+    const net  = req.networking || [];
+    const images = p.images     || [];
 
-    document.title = `${p.title} — UniPortal`;
+    document.title = p.title + ' — UniPortal';
 
-    document.getElementById('mainContent').innerHTML = `
-      <a href="/projects" class="back-link">← Back to Projects</a>
+    document.getElementById('mainContent').innerHTML =
+      '<a href="/projects" class="back-link">← Back to Projects</a>' +
 
-      <!-- Hero -->
-      <div class="project-hero fade-up">
-        <div class="hero-top">
-          <h1 class="hero-title">${esc(p.title)}</h1>
-          <span class="badge badge-${p.status}">${p.status}</span>
-        </div>
-        ${p.description ? `<p style="color:var(--muted);font-size:0.92rem;line-height:1.6;margin-bottom:18px;">${esc(p.description)}</p>` : ''}
-        <div class="hero-meta">
-          <div class="hero-meta-item">
-            <div class="author-avatar">${av}</div>
-            <span>${esc(author)}</span>
-          </div>
-          <div class="hero-meta-item"><span>📅</span><span>${date}</span></div>
-          <div class="hero-meta-item"><span>📎</span><span>${esc(p.file_name || '')}</span></div>
-          <div class="hero-meta-item"><span>📦</span><span>${formatBytes(p.file_size)}</span></div>
-        </div>
-      </div>
+      '<div class="project-hero fade-up">' +
+        '<div class="hero-top">' +
+          '<h1 class="hero-title">' + esc(p.title) + '</h1>' +
+          '<span class="badge badge-' + p.status + '">' + p.status + '</span>' +
+        '</div>' +
+        (p.description ? '<p style="color:var(--muted);font-size:0.92rem;line-height:1.6;margin-bottom:16px;">' + esc(p.description) + '</p>' : '') +
+        '<div class="hero-meta">' +
+          '<div class="hero-meta-item"><div class="author-avatar">' + av + '</div><span>' + esc(author) + '</span></div>' +
+          '<div class="hero-meta-item"><span>Date:</span><span>' + date + '</span></div>' +
+          '<div class="hero-meta-item"><span>File:</span><span>' + esc(p.file_name || '') + '</span></div>' +
+          '<div class="hero-meta-item"><span>Size:</span><span>' + formatBytes(p.file_size) + '</span></div>' +
+        '</div>' +
+        '<div class="hero-footer">' +
+          '<a href="/projects/' + p.id + '/download" class="download-btn">&#11015; Download File</a>' +
+        '</div>' +
+      '</div>' +
 
-      <!-- Tabs -->
-      <div class="detail-tabs fade-up delay-1">
-        <button class="detail-tab active" id="tab-images"       onclick="switchTab('images')">🖼 Images</button>
-        <button class="detail-tab"        id="tab-requirements" onclick="switchTab('requirements')">⚙️ Requirements</button>
-        <button class="detail-tab"        id="tab-readme"       onclick="switchTab('readme')">📖 README</button>
-      </div>
+      '<div class="detail-tabs fade-up delay-1">' +
+        '<button class="detail-tab active" id="tab-images"       onclick="switchTab(\'images\')">Images</button>' +
+        '<button class="detail-tab"        id="tab-requirements" onclick="switchTab(\'requirements\')">Requirements</button>' +
+        '<button class="detail-tab"        id="tab-readme"       onclick="switchTab(\'readme\')">README</button>' +
+      '</div>' +
 
-      <!-- ── IMAGES TAB ── -->
-      <div class="tab-panel active" id="panel-images">
-        ${renderImages(images)}
-      </div>
+      '<div class="tab-panel active" id="panel-images">' + renderImages(images) + '</div>' +
 
-      <!-- ── REQUIREMENTS TAB ── -->
-      <div class="tab-panel" id="panel-requirements">
-        <div class="section-card">
-          <div class="section-title">💻 Software Requirements</div>
-          ${renderSoftware(sw)}
-        </div>
-        <div class="section-card">
-          <div class="section-title">🔧 Hardware Requirements</div>
-          ${renderTable(hw, 'No hardware requirements listed.')}
-        </div>
-        <div class="section-card">
-          <div class="section-title">🌐 Networking Requirements</div>
-          ${renderTable(net, 'No networking requirements listed.')}
-        </div>
-      </div>
+      '<div class="tab-panel" id="panel-requirements">' +
+        '<div class="section-card"><div class="section-title">Software Requirements</div>' + renderSoftware(sw) + '</div>' +
+        '<div class="section-card"><div class="section-title">Hardware Requirements</div>' + renderTable(hw, 'No hardware requirements listed.') + '</div>' +
+        '<div class="section-card"><div class="section-title">Networking Requirements</div>' + renderTable(net, 'No networking requirements listed.') + '</div>' +
+      '</div>' +
 
-      <!-- ── README TAB ── -->
-      <div class="tab-panel" id="panel-readme">
-        <div class="section-card">
-          <div class="section-title">📖 Step-by-Step Guide</div>
-          ${p.readme
-            ? `<div class="readme-body">${parseMarkdown(p.readme)}</div>`
-            : `<div class="readme-empty">📭 No README provided for this project.</div>`}
-        </div>
-      </div>
-    `;
+      '<div class="tab-panel" id="panel-readme">' +
+        '<div class="section-card"><div class="section-title">Step-by-Step Guide</div>' +
+          (p.readme ? '<div class="readme-body">' + parseMarkdown(p.readme) + '</div>' : '<div class="readme-empty">No README provided for this project.</div>') +
+        '</div>' +
+      '</div>';
   }
 
-  /* ── Render helpers ── */
   function renderImages(images) {
-    // Split into 3 groups by convention (final, proven, web) or just show all
     if (!images || images.length === 0) {
-      return `<div class="section-card">
-        <div class="gallery-empty">📭 No images uploaded for this project.</div>
-      </div>`;
+      return '<div class="section-card"><div class="gallery-empty">No images uploaded for this project.</div></div>';
     }
-
-    return `<div class="section-card">
-      <div class="section-title">📸 Project Images</div>
-      <div class="gallery-grid">
-        ${images.map((src, i) => `
-          <div class="gallery-img" onclick="openLightbox('${src}')">
-            <img src="${src}" alt="Project image ${i+1}" loading="lazy" onerror="this.parentElement.style.display='none'" />
-          </div>`).join('')}
-      </div>
-    </div>`;
+    return '<div class="section-card"><div class="section-title">Project Images</div><div class="gallery-grid">' +
+      images.map(function(src, i) {
+        return '<div class="gallery-img" onclick="openLightbox(\'' + src + '\')">' +
+          '<img src="' + src + '" alt="Image ' + (i+1) + '" loading="lazy" onerror="this.parentElement.style.display=\'none\'" />' +
+          '</div>';
+      }).join('') +
+      '</div></div>';
   }
 
   function renderSoftware(sw) {
-    const langs = sw.languages  || [];
-    const fws   = sw.frameworks || [];
-    const dbs   = sw.databases  || [];
-    const other = sw.other      || [];
-
+    var langs = sw.languages  || [];
+    var fws   = sw.frameworks || [];
+    var dbs   = sw.databases  || [];
+    var other = sw.other      || [];
     if (!langs.length && !fws.length && !dbs.length && !other.length) {
-      return `<p class="empty-req">No software requirements listed.</p>`;
+      return '<p class="empty-req">No software requirements listed.</p>';
     }
-
-    const group = (label, items, cls) => items.length ? `
-      <div class="tag-group">
-        <div class="tag-label">${label}</div>
-        <div class="tag-list">${items.map(t=>`<span class="req-tag ${cls}">${esc(t)}</span>`).join('')}</div>
-      </div>` : '';
-
-    return group('Programming Languages', langs, 'lang')
-         + group('Frameworks / Libraries', fws,   'fw')
-         + group('Database Engines',       dbs,   'db')
-         + group('Other Tools & Services', other, 'other');
+    function group(label, items, cls) {
+      if (!items.length) return '';
+      return '<div class="tag-group"><div class="tag-label">' + label + '</div><div class="tag-list">' +
+        items.map(function(t){ return '<span class="req-tag ' + cls + '">' + esc(t) + '</span>'; }).join('') +
+        '</div></div>';
+    }
+    return group('Programming Languages', langs, 'lang') +
+           group('Frameworks / Libraries', fws, 'fw') +
+           group('Database Engines', dbs, 'db') +
+           group('Other Tools & Services', other, 'other');
   }
 
   function renderTable(rows, emptyMsg) {
-    const valid = (rows || []).filter(r => r.name);
-    if (!valid.length) return `<p class="empty-req">${emptyMsg}</p>`;
-    return `<table class="req-table">
-      <thead><tr><th>Category</th><th>Component / Device</th><th>Qty / Spec</th></tr></thead>
-      <tbody>
-        ${valid.map(r => `<tr>
-          <td><span class="cat-badge">${esc(r.category || '—')}</span></td>
-          <td>${esc(r.name)}</td>
-          <td style="color:var(--muted)">${esc(r.spec || '—')}</td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
+    var valid = (rows || []).filter(function(r){ return r.name; });
+    if (!valid.length) return '<p class="empty-req">' + emptyMsg + '</p>';
+    return '<table class="req-table"><thead><tr><th>Category</th><th>Component / Device</th><th>Qty / Spec</th></tr></thead><tbody>' +
+      valid.map(function(r){
+        return '<tr><td><span class="cat-badge">' + esc(r.category || '-') + '</span></td>' +
+               '<td>' + esc(r.name) + '</td>' +
+               '<td style="color:var(--muted)">' + esc(r.spec || '-') + '</td></tr>';
+      }).join('') +
+      '</tbody></table>';
   }
 
-  /* ── Markdown parser ── */
   function parseMarkdown(md) {
     return md
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+      .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
       .replace(/`([^`]+)`/g,'<code>$1</code>')
       .replace(/^---$/gm,'<hr>')
       .replace(/^### (.+)$/gm,'<h3>$1</h3>')
@@ -390,21 +248,18 @@
       .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
       .replace(/^[-*] (.+)$/gm,'<li>$1</li>')
       .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
-      .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+      .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul>' + m + '</ul>'; })
       .replace(/\n\n/g,'</p><p>')
-      .replace(/^(?!<[hupbl])(.+)$/gm,'$1')
       .replace(/\n/g,'<br>');
   }
 
-  /* ── Tab switching ── */
   function switchTab(tab) {
-    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.detail-tab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
     document.getElementById('tab-'   + tab).classList.add('active');
     document.getElementById('panel-' + tab).classList.add('active');
   }
 
-  /* ── Lightbox ── */
   function openLightbox(src) {
     document.getElementById('lightboxImg').src = src;
     document.getElementById('lightbox').classList.add('open');
@@ -414,14 +269,13 @@
     document.getElementById('lightbox').classList.remove('open');
     document.body.style.overflow = '';
   }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeLightbox(); });
 
-  /* ── Helpers ── */
   function esc(str) {
     return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
   function formatBytes(b) {
-    if (!b) return '—';
+    if (!b) return '--';
     if (b < 1024) return b + ' B';
     if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
     return (b/1048576).toFixed(2) + ' MB';
