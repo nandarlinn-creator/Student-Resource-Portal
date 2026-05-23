@@ -18,8 +18,8 @@ const Project = sequelize.define("Project", {
     allowNull: true,
   },
   readme: {
-    type: DataTypes.LONGTEXT,   // full markdown content
-    allowNull: true,
+  type: DataTypes.TEXT('long'),
+  allowNull: true,
   },
   requirements: {
     type: DataTypes.JSON,       // { software:{}, hardware:[], networking:[] }

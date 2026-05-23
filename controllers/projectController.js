@@ -3,8 +3,15 @@ const { validationResult } = require("express-validator");
 const Project = require("../models/Project");
 const User = require("../models/User");
 
-// ─── GET /projects ─────────────────────────────────────────────
+const wantsJson = (req) =>
+  req.xhr ||
+  req.headers.accept?.includes("application/json") ||
+  req.headers["content-type"]?.includes("application/json");
+
 exports.listProjects = async (req, res) => {
+  if (!wantsJson(req)) {
+    return res.sendFile("projects.html", { root: "public" });
+  }
   try {
     const projects = await Project.findAll({
       where: { status: "approved" },
@@ -18,25 +25,21 @@ exports.listProjects = async (req, res) => {
   }
 };
 
-// ─── GET /projects/upload ──────────────────────────────────────
 exports.getUpload = (req, res) => {
   res.sendFile("upload.html", { root: "public" });
 };
 
-// ─── POST /projects/upload ─────────────────────────────────────
 exports.postUpload = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  // project_file is now optional (README.txt blob from frontend)
   const projectFile = req.files?.project_file?.[0];
   if (!projectFile) {
     return res.status(400).json({ error: "A project file is required." });
   }
 
-  // Collect uploaded image paths
   const images = [];
   for (let i = 0; i < 15; i++) {
     const imgFile = req.files?.[`image_${i}`]?.[0];
@@ -68,16 +71,17 @@ exports.postUpload = async (req, res) => {
     res.status(500).json({ error: "Upload failed. Please try again." });
   }
 };
-
-// ─── GET /projects/:id ─────────────────────────────────────────
 exports.getProject = async (req, res) => {
+  // Browser navigation → serve the HTML page
+  if (!wantsJson(req)) {
+    return res.sendFile("project.html", { root: "public" });
+  }
+
   try {
     const project = await Project.findByPk(req.params.id, {
       include: [{ model: User, as: "uploader", attributes: ["name"] }],
     });
-
     if (!project) return res.status(404).json({ error: "Project not found." });
-
     res.json({ project });
   } catch (err) {
     console.error("[PROJECTS] Get error:", err);
