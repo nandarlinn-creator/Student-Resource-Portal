@@ -114,4 +114,3 @@ exports.getProject = async (req, res) => {
     res.status(500).json({ error: "Could not retrieve project." });
   }
 };
-

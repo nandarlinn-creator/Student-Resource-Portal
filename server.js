@@ -5,45 +5,42 @@ const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const path = require("path");
 
 const { sequelize } = require("./config/database");
-const authRoutes = require("./routes/authRoutes");
+const authRoutes    = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
+const adminRoutes   = require("./routes/adminRoutes");
 const { requireAuth } = require("./middleware/authMiddleware");
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ─── View Engine ───────────────────────────────────────────────
-// Using plain HTML + express-static for simplicity.
-// Swap for EJS/Pug/Handlebars as needed.
-app.set("view engine", "html");
+// ── Static files ───────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, "public")));
 
-// ─── Body Parsers ──────────────────────────────────────────────
+// ── Body parsers ───────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─── Session (stored in RDS via Sequelize) ─────────────────────
+// ── Session ────────────────────────────────────────────────────
 const sessionStore = new SequelizeStore({ db: sequelize });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 8, // 8 hours
-    },
-  })
-);
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: sessionStore,
+  cookie: {
+    secure:   process.env.NODE_ENV === "production",
+    httpOnly: true,
+    maxAge:   1000 * 60 * 60 * 8,
+  },
+}));
 
-sessionStore.sync(); // Create sessions table if not exists
+sessionStore.sync();
 
-// ─── Routes ────────────────────────────────────────────────────
-app.use("/auth", authRoutes);
+// ── Routes ─────────────────────────────────────────────────────
+app.use("/auth",     authRoutes);
 app.use("/projects", requireAuth, projectRoutes);
+app.use("/admin",    adminRoutes);
 
 // Root redirect
 app.get("/", (req, res) => {
@@ -51,29 +48,26 @@ app.get("/", (req, res) => {
   res.redirect("/auth/login");
 });
 
-// 404 Handler
+// 404
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// Global Error Handler
+// Global error handler
 app.use((err, req, res, next) => {
   console.error("[ERROR]", err.stack);
-  const status = err.status || 500;
-  res.status(status).json({ error: err.message || "Internal Server Error" });
+  res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
-// ─── Start ─────────────────────────────────────────────────────
+// ── Start ──────────────────────────────────────────────────────
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log("✅  Database connection established.");
-    await sequelize.sync({ alter: true }); // Use migrations in production
-    app.listen(PORT, () =>
-      console.log(`🚀  Server running on http://localhost:${PORT}`)
-    );
+    console.log("Database connection established.");
+    await sequelize.sync({ alter: true });
+    app.listen(PORT, () => console.log("Server running on http://localhost:" + PORT));
   } catch (err) {
-    console.error("❌  Unable to connect to database:", err.message);
+    console.error("Unable to connect to database:", err.message);
     process.exit(1);
   }
 })();

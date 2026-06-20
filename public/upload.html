@@ -6,358 +6,593 @@
   <title>Upload Project — Student Resource Portal</title>
   <link rel="stylesheet" href="/css/style.css" />
   <style>
-    .main-wrap {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      min-height: calc(100vh - 69px);
-    }
+    .main-wrap { flex:1; display:grid; grid-template-columns:240px 1fr; min-height:calc(100vh - 69px); }
+    aside { border-right:1px solid var(--border); padding:28px 16px; background:var(--card); position:sticky; top:69px; height:calc(100vh - 69px); overflow-y:auto; }
+    .sidebar-label { font-size:0.7rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:0 12px; margin-bottom:8px; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; text-decoration:none; color:var(--muted); font-size:0.88rem; transition:all 0.2s; margin-bottom:2px; }
+    .sidebar-link:hover { background:var(--border); color:var(--text); }
+    .sidebar-link.active { background:rgba(59,130,246,0.12); color:var(--accent); }
+    .content { padding:40px 48px; max-width:920px; }
 
-    /* ── Sidebar ── */
-    aside {
-      border-right: 1px solid var(--border);
-      padding: 32px 20px;
-      background: var(--card);
-    }
+    /* Header */
+    .page-header { margin-bottom:28px; }
+    .page-header h1 { font-family:var(--font-head); font-size:2rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; }
+    .page-header p { color:var(--muted); font-size:0.92rem; }
 
-    .sidebar-section { margin-bottom: 32px; }
+    /* Checklist */
+    .checklist { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:24px; }
+    .check-item { display:flex; align-items:center; gap:6px; font-size:0.82rem; }
+    .check-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background 0.3s; }
+    .check-dot.done { background:var(--success); }
+    .check-text { color:var(--muted); transition:color 0.3s; }
+    .check-item.done .check-text { color:var(--text); }
 
-    .sidebar-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 0 12px;
-      margin-bottom: 8px;
-    }
+    /* Steps */
+    .steps { display:flex; align-items:center; margin-bottom:28px; }
+    .step { display:flex; align-items:center; gap:10px; cursor:pointer; padding:10px 14px; border-radius:10px; transition:background 0.2s; flex-shrink:0; }
+    .step:hover { background:var(--border); }
+    .step-num { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; border:2px solid var(--border); color:var(--muted); background:var(--bg2); transition:all 0.3s; flex-shrink:0; }
+    .step-label { font-size:0.7rem; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:0.06em; }
+    .step-title { font-size:0.88rem; font-weight:600; color:var(--text); }
+    .step.active .step-num { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .step.done   .step-num { background:var(--success); border-color:var(--success); color:#fff; }
+    .step-connector { flex:1; height:1px; background:var(--border); min-width:16px; }
 
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 0.9rem;
-      transition: all 0.2s;
-      margin-bottom: 2px;
-    }
+    /* Title card */
+    .title-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:24px; }
 
-    .sidebar-link:hover { background: var(--border); color: var(--text); }
-    .sidebar-link.active { background: rgba(59,130,246,0.12); color: var(--accent); }
+    /* Panels */
+    .panel { display:none; }
+    .panel.active { display:block; animation:fadeUp 0.35s ease; }
+    .panel-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .panel-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
+    .panel-icon.blue  { background:rgba(59,130,246,0.15); }
+    .panel-icon.green { background:rgba(16,185,129,0.15); }
+    .panel-icon.amber { background:rgba(245,158,11,0.15); }
+    .panel-header h2 { font-family:var(--font-head); font-size:1.3rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:2px; }
+    .panel-header p  { font-size:0.84rem; color:var(--muted); }
 
-    .sidebar-link .icon { font-size: 1rem; width: 20px; text-align: center; }
+    /* Section cards */
+    .section-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px; }
+    .section-card h3 { font-family:var(--font-head); font-size:0.95rem; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px; padding-bottom:12px; border-bottom:1px solid var(--border); }
 
-    /* ── Content ── */
-    .content {
-      padding: 48px;
-      overflow-y: auto;
-    }
+    /* Image slots */
+    .image-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+    .img-slot { aspect-ratio:16/10; border:2px dashed var(--border); border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; position:relative; overflow:hidden; transition:all 0.2s; background:var(--bg2); }
+    .img-slot:hover { border-color:var(--accent); background:rgba(59,130,246,0.05); }
+    .img-slot input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .img-slot .slot-icon { font-size:1.4rem; pointer-events:none; }
+    .img-slot .slot-label { font-size:0.7rem; color:var(--muted); font-weight:500; text-align:center; padding:0 8px; pointer-events:none; }
+    .img-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:8px; }
+    .img-slot .img-remove { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.75); border:none; color:#fff; border-radius:50%; width:22px; height:22px; display:none; align-items:center; justify-content:center; font-size:0.7rem; cursor:pointer; z-index:2; }
+    .img-slot:hover .img-remove { display:flex; }
+    .add-more-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px dashed var(--border); background:none; color:var(--muted); font-size:0.8rem; cursor:pointer; transition:all 0.2s; }
+    .add-more-btn:hover { border-color:var(--accent); color:var(--accent); }
 
-    .page-header { margin-bottom: 40px; }
+    /* Tag input */
+    .tag-input-wrap { border:1px solid var(--border); border-radius:10px; padding:8px 12px; background:var(--bg2); display:flex; flex-wrap:wrap; gap:6px; cursor:text; min-height:46px; transition:border-color 0.2s; }
+    .tag-input-wrap:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,246,0.15); }
+    .tag { display:inline-flex; align-items:center; gap:4px; background:rgba(59,130,246,0.15); color:var(--accent); border-radius:6px; padding:3px 8px; font-size:0.8rem; font-weight:500; }
+    .tag button { background:none; border:none; color:var(--accent); cursor:pointer; padding:0; font-size:0.85rem; }
+    .tag-real-input { border:none; background:none; outline:none; color:var(--text); font-family:var(--font-body); font-size:0.9rem; min-width:100px; flex:1; padding:2px 0; }
+    .tag-hint { font-size:0.74rem; color:var(--muted); margin-top:5px; }
 
-    .page-header h1 {
-      font-family: var(--font-head);
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-    }
+    /* Req rows */
+    .col-headers { display:grid; gap:10px; margin-bottom:6px; }
+    .col-headers.three-col { grid-template-columns:150px 1fr 100px 36px; }
+    .col-headers span { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); padding-left:4px; }
+    .req-row { display:grid; gap:10px; margin-bottom:10px; align-items:start; }
+    .req-row.three-col { grid-template-columns:150px 1fr 100px auto; }
+    .req-row input,.req-row select { margin-bottom:0; }
+    .btn-remove-row { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:var(--danger); border-radius:8px; padding:9px 10px; cursor:pointer; font-size:0.85rem; transition:all 0.2s; }
+    .btn-remove-row:hover { background:rgba(239,68,68,0.2); }
+    .btn-add-row { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px dashed var(--border); background:none; color:var(--muted); font-size:0.8rem; cursor:pointer; transition:all 0.2s; margin-top:6px; }
+    .btn-add-row:hover { border-color:var(--accent); color:var(--accent); }
 
-    .page-header p { color: var(--muted); font-size: 0.95rem; }
+    /* README */
+    .readme-toolbar { display:flex; gap:4px; flex-wrap:wrap; padding:10px 12px; background:var(--bg2); border:1px solid var(--border); border-bottom:none; border-radius:10px 10px 0 0; }
+    .md-btn { padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:none; color:var(--muted); font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .md-btn:hover { background:var(--border); color:var(--text); }
+    .readme-tabs { display:flex; border-bottom:1px solid var(--border); background:var(--bg2); padding:0 12px; }
+    .readme-tab { padding:8px 16px; border:none; background:none; color:var(--muted); font-size:0.82rem; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; }
+    .readme-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+    #readmeEditor { width:100%; min-height:300px; background:var(--bg2); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:16px; color:var(--text); font-family:'Courier New',monospace; font-size:0.87rem; line-height:1.7; resize:vertical; outline:none; transition:border-color 0.2s; }
+    #readmeEditor:focus { border-color:var(--accent); }
+    #readmePreview { display:none; min-height:300px; background:var(--bg2); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:20px 24px; color:var(--text); font-size:0.9rem; line-height:1.8; }
+    #readmePreview h1,#readmePreview h2,#readmePreview h3 { font-family:var(--font-head); font-weight:700; margin:18px 0 8px; }
+    #readmePreview h1 { font-size:1.5rem; }
+    #readmePreview h2 { font-size:1.15rem; border-bottom:1px solid var(--border); padding-bottom:6px; }
+    #readmePreview code { background:var(--border); padding:2px 6px; border-radius:4px; font-size:0.85em; font-family:monospace; }
+    #readmePreview pre { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; overflow-x:auto; margin:10px 0; }
+    #readmePreview pre code { background:none; padding:0; }
+    #readmePreview ul,#readmePreview ol { padding-left:20px; margin-bottom:10px; }
+    #readmePreview li { margin-bottom:3px; }
+    #readmePreview strong { font-weight:600; }
+    #readmePreview blockquote { border-left:3px solid var(--accent); padding-left:14px; color:var(--muted); margin:10px 0; }
 
-    .upload-grid {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 24px;
-      align-items: start;
-    }
+    /* Nav */
+    .panel-nav { display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
+    .btn-back { display:flex; align-items:center; gap:6px; padding:11px 20px; border-radius:10px; border:1px solid var(--border); background:none; color:var(--muted); font-size:0.9rem; cursor:pointer; transition:all 0.2s; }
+    .btn-back:hover { border-color:var(--text); color:var(--text); }
+    .btn-next { display:flex; align-items:center; gap:6px; padding:11px 24px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .btn-next:hover { opacity:0.9; transform:translateY(-1px); }
+    .btn-submit { display:flex; align-items:center; gap:8px; padding:12px 28px; border-radius:10px; background:linear-gradient(135deg,var(--success),#059669); border:none; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .btn-submit:hover { opacity:0.9; transform:translateY(-1px); box-shadow:0 6px 20px rgba(16,185,129,0.3); }
+    .btn-submit:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
 
-    /* ── Drop Zone ── */
-    .drop-zone {
-      border: 2px dashed var(--border);
-      border-radius: 14px;
-      padding: 48px 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.25s;
-      background: var(--bg2);
-      margin-bottom: 24px;
-      position: relative;
-    }
+    /* Progress */
+    .upload-progress { display:none; margin-top:14px; }
+    .upload-progress.show { display:block; }
+    .progress-bar-bg { height:5px; background:var(--border); border-radius:99px; overflow:hidden; margin-bottom:6px; }
+    .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; width:0%; transition:width 0.3s; }
+    .progress-label { font-size:0.76rem; color:var(--muted); }
 
-    .drop-zone:hover, .drop-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(59,130,246,0.05);
-    }
-
-    .drop-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-
-    .drop-icon { font-size: 2.5rem; margin-bottom: 12px; }
-
-    .drop-title {
-      font-family: var(--font-head);
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .drop-sub { font-size: 0.82rem; color: var(--muted); }
-    .drop-sub span { color: var(--accent); font-weight: 500; }
-
-    .file-types {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-      margin-top: 16px;
-    }
-
-    .file-type-tag {
-      background: var(--border);
-      border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-
-    /* ── Selected File ── */
-    .file-preview {
-      display: none;
-      align-items: center;
-      gap: 14px;
-      background: rgba(59,130,246,0.08);
-      border: 1px solid rgba(59,130,246,0.25);
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 24px;
-    }
-
-    .file-preview.show { display: flex; }
-
-    .file-preview-icon { font-size: 1.8rem; }
-
-    .file-preview-info { flex: 1; }
-    .file-preview-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 2px; }
-    .file-preview-size { font-size: 0.78rem; color: var(--muted); }
-
-    .file-remove {
-      background: none; border: none;
-      color: var(--muted); cursor: pointer;
-      font-size: 1.1rem; padding: 4px;
-      transition: color 0.2s;
-    }
-    .file-remove:hover { color: var(--danger); }
-
-    /* ── Progress ── */
-    .progress-wrap { display: none; margin-bottom: 20px; }
-    .progress-wrap.show { display: block; }
-
-    .progress-bar-bg {
-      height: 6px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius: 99px;
-      width: 0%;
-      transition: width 0.3s;
-    }
-
-    .progress-label { font-size: 0.78rem; color: var(--muted); }
-
-    /* ── Info Panel ── */
-    .info-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-    }
-
-    .info-card h3 {
-      font-family: var(--font-head);
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .info-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 14px;
-      font-size: 0.85rem;
-    }
-
-    .info-item-icon { font-size: 1rem; margin-top: 1px; }
-    .info-item-text { color: var(--muted); line-height: 1.5; }
-    .info-item-text strong { color: var(--text); font-weight: 500; }
-
-    @media (max-width: 1024px) {
-      .upload-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 768px) {
-      .main-wrap { grid-template-columns: 1fr; }
-      aside { display: none; }
-      .content { padding: 32px 20px; }
+    @media (max-width:768px) {
+      .main-wrap { grid-template-columns:1fr; }
+      aside { display:none; }
+      .content { padding:24px 16px; }
+      .image-grid { grid-template-columns:1fr 1fr; }
+      .req-row.three-col,.col-headers.three-col { grid-template-columns:1fr 1fr auto; }
     }
   </style>
 </head>
 <body>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
-
   <div class="page-wrap">
     <nav>
-      <a href="/" class="nav-logo">
-        <span></span>UniPortal
-      </a>
+      <a href="/" class="nav-logo"><span></span>UniPortal</a>
       <div class="nav-links">
         <a href="/projects">Browse Projects</a>
         <button class="btn-nav-primary" onclick="logout()">Sign Out</button>
       </div>
     </nav>
-
     <div class="main-wrap">
-      <!-- Sidebar -->
       <aside>
-        <div class="sidebar-section">
+        <div style="margin-bottom:28px;">
           <p class="sidebar-label">Navigation</p>
-          <a href="/projects" class="sidebar-link">
-            <span class="icon">📁</span> All Projects
-          </a>
-          <a href="/projects/upload" class="sidebar-link active">
-            <span class="icon">⬆️</span> Upload Project
-          </a>
+          <a href="/projects" class="sidebar-link"><span>📁</span> All Projects</a>
+          <a href="/projects/upload" class="sidebar-link active"><span>⬆️</span> Upload Project</a>
         </div>
-        <div class="sidebar-section">
+        <div>
           <p class="sidebar-label">Account</p>
-          <a href="#" class="sidebar-link">
-            <span class="icon">👤</span> My Profile
-          </a>
-          <a href="#" class="sidebar-link" onclick="logout(); return false;">
-            <span class="icon">🚪</span> Sign Out
-          </a>
+          <a href="#" class="sidebar-link" onclick="logout();return false;"><span>🚪</span> Sign Out</a>
         </div>
       </aside>
 
-      <!-- Main Content -->
       <main class="content">
         <div class="page-header fade-up">
-          <h1>Upload Project</h1>
-          <p>Share your work with the university community. All uploads are reviewed before publishing.</p>
+          <h1>Submit Your Project</h1>
+          <p>Complete all three sections — images, requirements, and a README guide.</p>
         </div>
 
-        <div class="alert alert-error" id="errorAlert">
-          <span>⚠</span><span id="errorMsg">Something went wrong.</span>
+        <!-- Checklist -->
+        <div class="checklist fade-up delay-1">
+          <div class="check-item" id="chk-info"><div class="check-dot"></div><span class="check-text">Project Info</span></div>
+          <div class="check-item" id="chk-images"><div class="check-dot"></div><span class="check-text">Result Images</span></div>
+          <div class="check-item" id="chk-req"><div class="check-dot"></div><span class="check-text">Requirements</span></div>
+          <div class="check-item" id="chk-readme"><div class="check-dot"></div><span class="check-text">README</span></div>
         </div>
-        <div class="alert alert-success" id="successAlert">
-          <span>✓</span><span id="successMsg">Project submitted successfully! Pending review.</span>
+
+        <!-- Steps -->
+        <div class="steps fade-up delay-1">
+          <div class="step active" id="step-1" onclick="goToStep(1)">
+            <div class="step-num" id="sn-1">1</div>
+            <div><div class="step-label">Step 1</div><div class="step-title">Images</div></div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step" id="step-2" onclick="goToStep(2)">
+            <div class="step-num" id="sn-2">2</div>
+            <div><div class="step-label">Step 2</div><div class="step-title">Requirements</div></div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step" id="step-3" onclick="goToStep(3)">
+            <div class="step-num" id="sn-3">3</div>
+            <div><div class="step-label">Step 3</div><div class="step-title">README</div></div>
+          </div>
         </div>
 
-        <div class="upload-grid">
-          <div class="fade-up delay-1">
-            <!-- Drop Zone -->
-            <div class="drop-zone" id="dropZone">
-              <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.txt,.png,.jpg,.jpeg"
-                onchange="handleFileSelect(this)" />
-              <div class="drop-icon">📂</div>
-              <p class="drop-title">Drop your file here</p>
-              <p class="drop-sub">or <span>browse to upload</span></p>
-              <div class="file-types">
-                <span class="file-type-tag">PDF</span>
-                <span class="file-type-tag">DOCX</span>
-                <span class="file-type-tag">PPTX</span>
-                <span class="file-type-tag">ZIP</span>
-                <span class="file-type-tag">TXT</span>
-                <span class="file-type-tag">PNG/JPG</span>
-              </div>
-            </div>
+        <!-- Project title always visible -->
+        <div class="title-card fade-up delay-2">
+          <div class="form-group" style="margin:0;">
+            <label for="projectTitle">Project Title *</label>
+            <input type="text" id="projectTitle" placeholder="e.g. IoT Smart Campus Monitoring System" maxlength="200" oninput="updateChecklist()" />
+          </div>
+        </div>
 
-            <!-- File Preview -->
-            <div class="file-preview" id="filePreview">
-              <div class="file-preview-icon" id="fileIcon">📄</div>
-              <div class="file-preview-info">
-                <div class="file-preview-name" id="fileName">—</div>
-                <div class="file-preview-size" id="fileSize">—</div>
-              </div>
-              <button class="file-remove" onclick="removeFile()">✕</button>
-            </div>
-
-            <!-- Progress -->
-            <div class="progress-wrap" id="progressWrap">
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progressFill"></div>
-              </div>
-              <p class="progress-label" id="progressLabel">Uploading...</p>
-            </div>
-
-            <!-- Form Fields -->
-            <div class="form-group">
-              <label for="title">Project Title *</label>
-              <input type="text" id="title" placeholder="e.g. Machine Learning for Climate Data" maxlength="200" required />
-            </div>
-
-            <div class="form-group">
-              <label for="description">Description</label>
-              <textarea id="description" placeholder="Briefly describe your project, its goals and findings..." maxlength="2000"></textarea>
-            </div>
-
-            <button class="btn btn-primary" id="uploadBtn" onclick="handleUpload()">
-              <span class="spinner"></span>
-              <span class="btn-text">Submit Project</span>
-            </button>
+        <!-- ══ PANEL 1 — IMAGES ══ -->
+        <div class="panel active" id="panel-1">
+          <div class="panel-header">
+            <div class="panel-icon blue">🖼</div>
+            <div><h2>Result Images</h2><p>Upload screenshots, hardware output photos, or website captures.</p></div>
           </div>
 
-          <!-- Info Panel -->
-          <div class="info-card fade-up delay-2">
-            <h3>📋 Submission Guidelines</h3>
-            <div class="info-item">
-              <span class="info-item-icon">📏</span>
-              <p class="info-item-text"><strong>Max file size:</strong> 20 MB per upload.</p>
+          <div class="section-card">
+            <h3>🏆 Final Result / Output</h3>
+            <div class="image-grid" id="grid-final">
+              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
             </div>
-            <div class="info-item">
-              <span class="info-item-icon">📂</span>
-              <p class="info-item-text"><strong>Formats accepted:</strong> PDF, DOCX, PPTX, ZIP, TXT, PNG, JPG.</p>
+            <button class="add-more-btn" onclick="addSlot('grid-final','Final Result')">+ Add more</button>
+          </div>
+
+          <div class="section-card">
+            <h3>✅ Proven / Testing Result</h3>
+            <div class="image-grid" id="grid-proven">
+              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">🧪</span><span class="slot-label">Test / Proof</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">🧪</span><span class="slot-label">Test / Proof</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
             </div>
-            <div class="info-item">
-              <span class="info-item-icon">🔍</span>
-              <p class="info-item-text"><strong>Review process:</strong> All projects are reviewed by faculty before appearing publicly.</p>
+            <button class="add-more-btn" onclick="addSlot('grid-proven','Test / Proof')">+ Add more</button>
+          </div>
+
+          <div class="section-card">
+            <h3>🌐 Website / UI Screenshot</h3>
+            <div class="image-grid" id="grid-web">
+              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">💻</span><span class="slot-label">Website / UI</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">💻</span><span class="slot-label">Website / UI</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
             </div>
-            <div class="info-item">
-              <span class="info-item-icon">⚖️</span>
-              <p class="info-item-text"><strong>Academic integrity:</strong> Only submit original work. Plagiarism will result in removal.</p>
+            <button class="add-more-btn" onclick="addSlot('grid-web','Website / UI')">+ Add more</button>
+          </div>
+
+          <div class="panel-nav">
+            <div></div>
+            <button class="btn-next" onclick="goToStep(2)">Next: Requirements →</button>
+          </div>
+        </div>
+
+        <!-- ══ PANEL 2 — REQUIREMENTS ══ -->
+        <div class="panel" id="panel-2">
+          <div class="panel-header">
+            <div class="panel-icon green">⚙️</div>
+            <div><h2>Requirements</h2><p>All software, hardware, and networking components needed to run this project.</p></div>
+          </div>
+
+          <div class="section-card">
+            <h3>💻 Software Requirements</h3>
+            <div class="form-group">
+              <label>Programming Language(s)</label>
+              <div class="tag-input-wrap" id="w-lang" onclick="document.getElementById('i-lang').focus()">
+                <input class="tag-real-input" id="i-lang" placeholder="e.g. Python, JavaScript — press Enter" onkeydown="tagKey(event,'w-lang')">
+              </div>
+              <p class="tag-hint">Press Enter or comma after each item.</p>
             </div>
-            <div class="info-item">
-              <span class="info-item-icon">📧</span>
-              <p class="info-item-text"><strong>Notification:</strong> You'll receive a confirmation once your project is reviewed.</p>
+            <div class="form-group">
+              <label>Framework / Library</label>
+              <div class="tag-input-wrap" id="w-fw" onclick="document.getElementById('i-fw').focus()">
+                <input class="tag-real-input" id="i-fw" placeholder="e.g. Django, React, Express" onkeydown="tagKey(event,'w-fw')">
+              </div>
+              <p class="tag-hint">Press Enter or comma after each item.</p>
             </div>
+            <div class="form-group">
+              <label>Database Engine</label>
+              <div class="tag-input-wrap" id="w-db" onclick="document.getElementById('i-db').focus()">
+                <input class="tag-real-input" id="i-db" placeholder="e.g. MySQL, MongoDB, PostgreSQL" onkeydown="tagKey(event,'w-db')">
+              </div>
+              <p class="tag-hint">Press Enter or comma after each item.</p>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Other Tools / Services</label>
+              <div class="tag-input-wrap" id="w-other" onclick="document.getElementById('i-other').focus()">
+                <input class="tag-real-input" id="i-other" placeholder="e.g. Docker, Nginx, AWS EC2" onkeydown="tagKey(event,'w-other')">
+              </div>
+              <p class="tag-hint">Press Enter or comma after each item.</p>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <h3>🔧 Hardware Requirements</h3>
+            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Microcontrollers, sensors, speakers, LEDs, breadboards and other physical components.</p>
+            <div class="col-headers three-col">
+              <span>Category</span><span>Component Name</span><span>Qty / Spec</span><span></span>
+            </div>
+            <div id="hw-rows">
+              <div class="req-row three-col">
+                <select><option value="">Category</option><option>Arduino</option><option>Raspberry Pi</option><option>Sensor</option><option>Speaker / Audio</option><option>LED / Light</option><option>Breadboard</option><option>Display</option><option>Camera</option><option>Other</option></select>
+                <input type="text" placeholder="e.g. Arduino Uno">
+                <input type="text" placeholder="e.g. x1">
+                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
+              </div>
+              <div class="req-row three-col">
+                <select><option value="">Category</option><option>Arduino</option><option>Raspberry Pi</option><option>Sensor</option><option>Speaker / Audio</option><option>LED / Light</option><option>Breadboard</option><option>Display</option><option>Camera</option><option>Other</option></select>
+                <input type="text" placeholder="e.g. Speaker Blackboard">
+                <input type="text" placeholder="e.g. x2">
+                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
+              </div>
+            </div>
+            <button class="btn-add-row" onclick="addHwRow()">+ Add hardware component</button>
+          </div>
+
+          <div class="section-card">
+            <h3>🌐 Networking Requirements</h3>
+            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Switches, routers, servers, computers, and other network equipment.</p>
+            <div class="col-headers three-col">
+              <span>Category</span><span>Device Name</span><span>Qty / Spec</span><span></span>
+            </div>
+            <div id="net-rows">
+              <div class="req-row three-col">
+                <select><option value="">Category</option><option>Switch</option><option>Layer 3 Switch</option><option>Router</option><option>Access Point</option><option>Server</option><option>Computer / PC</option><option>Firewall</option><option>Other</option></select>
+                <input type="text" placeholder="e.g. Switch S9600">
+                <input type="text" placeholder="e.g. x1">
+                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
+              </div>
+              <div class="req-row three-col">
+                <select><option value="">Category</option><option>Switch</option><option>Layer 3 Switch</option><option>Router</option><option>Access Point</option><option>Server</option><option>Computer / PC</option><option>Firewall</option><option>Other</option></select>
+                <input type="text" placeholder="e.g. Computer">
+                <input type="text" placeholder="e.g. x3">
+                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
+              </div>
+            </div>
+            <button class="btn-add-row" onclick="addNetRow()">+ Add network device</button>
+          </div>
+
+          <div class="panel-nav">
+            <button class="btn-back" onclick="goToStep(1)">← Back</button>
+            <button class="btn-next" onclick="goToStep(3)">Next: README →</button>
+          </div>
+        </div>
+
+        <!-- ══ PANEL 3 — README ══ -->
+        <div class="panel" id="panel-3">
+          <div class="panel-header">
+            <div class="panel-icon amber">📖</div>
+            <div><h2>README — Step-by-Step Guide</h2><p>Write a walkthrough so others can replicate or deploy your project.</p></div>
+          </div>
+
+          <div class="section-card" style="padding:0;overflow:hidden;">
+            <div class="readme-toolbar">
+              <button class="md-btn" onclick="md('# ','')">H1</button>
+              <button class="md-btn" onclick="md('## ','')">H2</button>
+              <button class="md-btn" onclick="md('### ','')">H3</button>
+              <button class="md-btn" onclick="md('**','**')">B</button>
+              <button class="md-btn" onclick="md('*','*')">I</button>
+              <button class="md-btn" onclick="md('`','`')">Code</button>
+              <button class="md-btn" onclick="md('\n```\n','\n```')">Block</button>
+              <button class="md-btn" onclick="md('- ','')">List</button>
+              <button class="md-btn" onclick="md('1. ','')">1.</button>
+              <button class="md-btn" onclick="insertTemplate()">Template</button>
+            </div>
+            <div class="readme-tabs">
+              <button class="readme-tab active" id="tab-write"   onclick="readmeTab('write')">Write</button>
+              <button class="readme-tab"         id="tab-preview" onclick="readmeTab('preview')">Preview</button>
+            </div>
+            <textarea id="readmeEditor" placeholder="Write your step-by-step guide here..." oninput="updateChecklist()"></textarea>
+            <div id="readmePreview"></div>
+          </div>
+
+          <div class="alert alert-error"   id="errorAlert"   style="margin-top:16px;display:none;"><span>!</span><span id="errorMsg"></span></div>
+          <div class="alert alert-success" id="successAlert" style="margin-top:16px;display:none;"><span>✓</span><span>Project submitted! Pending faculty review.</span></div>
+          <div class="upload-progress" id="uploadProgress">
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+            <p class="progress-label" id="progressLabel">Uploading...</p>
+          </div>
+
+          <div class="panel-nav">
+            <button class="btn-back" onclick="goToStep(2)">← Back</button>
+            <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">Submit Project</button>
           </div>
         </div>
       </main>
     </div>
   </div>
 
-  <script src="/js/upload.js"></script>
+<script>
+function goToStep(n) {
+  for (var i = 1; i < n; i++) {
+    document.getElementById('step-'+i).classList.add('done');
+    document.getElementById('sn-'+i).textContent = 'v';
+  }
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('panel-'+n).classList.add('active');
+  document.getElementById('step-'+n).classList.add('active');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function updateChecklist() {
+  var title = document.getElementById('projectTitle').value.trim();
+  setChk('chk-info', title.length >= 3);
+  setChk('chk-images', document.querySelectorAll('.img-slot img').length > 0);
+  setChk('chk-req', document.querySelectorAll('.tag').length > 0);
+  setChk('chk-readme', document.getElementById('readmeEditor').value.trim().length > 20);
+}
+function setChk(id, done) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('done', done);
+  el.querySelector('.check-dot').classList.toggle('done', done);
+}
+
+function previewImg(input) {
+  var slot = input.closest('.img-slot');
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = slot.querySelector('img');
+    if (!img) { img = document.createElement('img'); slot.appendChild(img); }
+    img.src = e.target.result;
+    slot.querySelector('.slot-icon').style.display = 'none';
+    slot.querySelector('.slot-label').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+  updateChecklist();
+}
+function removeImg(e, btn) {
+  e.stopPropagation();
+  var slot = btn.closest('.img-slot');
+  var img = slot.querySelector('img');
+  if (img) img.remove();
+  slot.querySelector('input').value = '';
+  slot.querySelector('.slot-icon').style.display = '';
+  slot.querySelector('.slot-label').style.display = '';
+  updateChecklist();
+}
+function addSlot(gridId, label) {
+  var grid = document.getElementById(gridId);
+  var slot = document.createElement('div');
+  slot.className = 'img-slot';
+  slot.innerHTML = '<input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">'+label+'</span><button class="img-remove" onclick="removeImg(event,this)">x</button>';
+  grid.appendChild(slot);
+}
+
+function tagKey(e, wrapId) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    var val = e.target.value.replace(',','').trim();
+    if (val) addTag(wrapId, val);
+    e.target.value = '';
+    updateChecklist();
+  }
+  if (e.key === 'Backspace' && !e.target.value) {
+    var tags = document.getElementById(wrapId).querySelectorAll('.tag');
+    if (tags.length) tags[tags.length-1].remove();
+    updateChecklist();
+  }
+}
+function addTag(wrapId, val) {
+  var wrap  = document.getElementById(wrapId);
+  var input = wrap.querySelector('.tag-real-input');
+  var tag   = document.createElement('span');
+  tag.className = 'tag';
+  tag.innerHTML = val + ' <button onclick="this.parentElement.remove();updateChecklist()">x</button>';
+  wrap.insertBefore(tag, input);
+}
+
+function hwRowHtml() {
+  return '<div class="req-row three-col"><select><option value="">Category</option><option>Arduino</option><option>Raspberry Pi</option><option>Sensor</option><option>Speaker / Audio</option><option>LED / Light</option><option>Breadboard</option><option>Display</option><option>Camera</option><option>Other</option></select><input type="text" placeholder="Component name"><input type="text" placeholder="Qty / Spec"><button class="btn-remove-row" onclick="removeRow(this)">x</button></div>';
+}
+function netRowHtml() {
+  return '<div class="req-row three-col"><select><option value="">Category</option><option>Switch</option><option>Layer 3 Switch</option><option>Router</option><option>Access Point</option><option>Server</option><option>Computer / PC</option><option>Firewall</option><option>Other</option></select><input type="text" placeholder="Device name"><input type="text" placeholder="Qty / Spec"><button class="btn-remove-row" onclick="removeRow(this)">x</button></div>';
+}
+function addHwRow()  { document.getElementById('hw-rows').insertAdjacentHTML('beforeend', hwRowHtml()); }
+function addNetRow() { document.getElementById('net-rows').insertAdjacentHTML('beforeend', netRowHtml()); }
+function removeRow(btn) { btn.closest('.req-row').remove(); }
+
+function md(before, after) {
+  var ta = document.getElementById('readmeEditor');
+  var s = ta.selectionStart, e = ta.selectionEnd;
+  var sel = ta.value.substring(s, e);
+  ta.value = ta.value.substring(0,s) + before + sel + after + ta.value.substring(e);
+  ta.focus();
+  ta.setSelectionRange(s+before.length, s+before.length+sel.length);
+  updateChecklist();
+}
+function insertTemplate() {
+  document.getElementById('readmeEditor').value =
+'# Project Title\n\n## Overview\nBrief description of what this project does.\n\n## Prerequisites\nList everything needed before starting.\n\n## Software Setup\n\n### Step 1 — Clone the Repository\n```bash\ngit clone https://github.com/your-repo.git\ncd your-project\n```\n\n### Step 2 — Install Dependencies\n```bash\nnpm install\n```\n\n### Step 3 — Configure Environment\n```bash\ncp .env.example .env\n# Fill in your credentials\n```\n\n### Step 4 — Run the Application\n```bash\nnpm start\n```\n\n## Hardware Setup\n1. Connect the Arduino Uno to your computer via USB\n2. Upload the firmware using Arduino IDE\n3. Wire the LED and speaker per the circuit diagram\n\n## Networking Setup\n1. Configure the S9600 switch with the provided config\n2. Assign static IPs as per the network topology\n\n## Usage\nExplain how to use the project after setup.\n\n## Troubleshooting\nCommon issues and fixes.\n';
+  updateChecklist();
+}
+function readmeTab(tab) {
+  var editor  = document.getElementById('readmeEditor');
+  var preview = document.getElementById('readmePreview');
+  document.getElementById('tab-write').classList.toggle('active', tab==='write');
+  document.getElementById('tab-preview').classList.toggle('active', tab==='preview');
+  if (tab === 'preview') {
+    preview.innerHTML = parseMarkdown(editor.value);
+    preview.style.display = 'block';
+    editor.style.display  = 'none';
+  } else {
+    preview.style.display = 'none';
+    editor.style.display  = 'block';
+  }
+}
+function parseMarkdown(md) {
+  return md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^---$/gm,'<hr>').replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, function(m){ return '<ul>'+m+'</ul>'; })
+    .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+}
+
+async function handleSubmit() {
+  var title = document.getElementById('projectTitle').value.trim();
+  if (!title) { goToStep(1); showErr('Project title is required.'); return; }
+
+  var readme = document.getElementById('readmeEditor').value.trim();
+  var requirements = {
+    software: {
+      languages:  getTags('w-lang'),
+      frameworks: getTags('w-fw'),
+      databases:  getTags('w-db'),
+      other:      getTags('w-other'),
+    },
+    hardware:   getRows('hw-rows'),
+    networking: getRows('net-rows'),
+  };
+
+  var fd = new FormData();
+  fd.append('title', title);
+  fd.append('description', readme.substring(0, 500));
+  fd.append('readme', readme);
+  fd.append('requirements', JSON.stringify(requirements));
+
+  var imgIndex = 0;
+  document.querySelectorAll('.img-slot input[type=file]').forEach(function(inp) {
+    if (inp.files[0]) { fd.append('image_' + imgIndex, inp.files[0]); imgIndex++; }
+  });
+
+  fd.append('project_file', new Blob([readme || title], { type:'text/plain' }), 'README.txt');
+
+  showProgress(0, 'Submitting...');
+  document.getElementById('submitBtn').disabled = true;
+
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', function(e) {
+      if (e.lengthComputable) showProgress(Math.round(e.loaded/e.total*90), 'Uploading...');
+    });
+    var result = await new Promise(function(res, rej) {
+      xhr.onload  = function(){ res({ status:xhr.status, body:xhr.responseText }); };
+      xhr.onerror = function(){ rej(new Error('Network error')); };
+      xhr.open('POST', '/projects/upload');
+      xhr.send(fd);
+    });
+    showProgress(100, 'Done!');
+    var data = JSON.parse(result.body);
+    if (result.status === 201) {
+      document.getElementById('successAlert').style.display = 'flex';
+      setTimeout(function(){ window.location.href = '/projects'; }, 2000);
+    } else {
+      showErr(data.error || (data.errors && data.errors[0] && data.errors[0].msg) || 'Submission failed.');
+      document.getElementById('submitBtn').disabled = false;
+    }
+  } catch(err) {
+    showErr('Network error. Please try again.');
+    document.getElementById('submitBtn').disabled = false;
+  }
+}
+
+function getTags(wrapId) {
+  return Array.from(document.getElementById(wrapId).querySelectorAll('.tag'))
+    .map(function(t){ return t.textContent.replace('x','').trim(); });
+}
+function getRows(containerId) {
+  return Array.from(document.getElementById(containerId).querySelectorAll('.req-row')).map(function(row){
+    var inputs = row.querySelectorAll('input,select');
+    return { category:inputs[0].value, name:inputs[1].value, spec:inputs[2].value };
+  }).filter(function(r){ return r.name; });
+}
+function showProgress(pct, label) {
+  document.getElementById('uploadProgress').classList.add('show');
+  document.getElementById('progressFill').style.width  = pct + '%';
+  document.getElementById('progressLabel').textContent = label;
+}
+function showErr(msg) {
+  var el = document.getElementById('errorAlert');
+  document.getElementById('errorMsg').textContent = msg;
+  el.style.display = 'flex';
+}
+async function logout() {
+  await fetch('/auth/logout', { method:'POST' });
+  window.location.href = '/auth/login';
+}
+</script>
 </body>
 </html>

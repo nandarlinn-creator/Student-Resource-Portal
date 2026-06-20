@@ -16,4 +16,3 @@ router.get("/:id/download", projectController.downloadProject);  // <-- download
 router.get("/:id",     projectController.getProject);
 
 module.exports = router;
-

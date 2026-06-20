@@ -5,6 +5,7 @@ const fs = require("fs");
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "public/uploads";
 const MAX_MB = parseInt(process.env.MAX_FILE_SIZE_MB || "20", 10);
 
+// ── Allowed MIME types ──────────────────────────────────────────
 const ALLOWED_TYPES = [
   "application/pdf",
   "application/zip",
@@ -20,26 +21,36 @@ const ALLOWED_TYPES = [
   "image/webp",
 ];
 
+// Ensure both directories exist
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 fs.mkdirSync(path.join(UPLOAD_DIR, "images"), { recursive: true });
 
+// ── Storage ──────────────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // images go into uploads/images/
+    // Images go into uploads/images/, everything else into uploads/
     const isImage = file.mimetype.startsWith("image/");
     cb(null, isImage ? path.join(UPLOAD_DIR, "images") : UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${Date.now()}-${req.session.userId}${ext}`);
+    const safeName = `${Date.now()}-${req.session.userId}-${Math.round(Math.random() * 1e6)}${ext}`;
+    cb(null, safeName);
   },
 });
 
+// ── File Filter ──────────────────────────────────────────────────
 const fileFilter = (req, file, cb) => {
   if (ALLOWED_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", `File type not allowed: ${file.mimetype}`), false);
+    cb(
+      new multer.MulterError(
+        "LIMIT_UNEXPECTED_FILE",
+        `File type not allowed: ${file.mimetype}`
+      ),
+      false
+    );
   }
 };
 
@@ -49,7 +60,7 @@ const upload = multer({
   limits: { fileSize: MAX_MB * 1024 * 1024 },
 });
 
-// Accept: one 'project_file' + up to 15 images named image_0, image_1, ...
+// Accept one 'project_file' plus up to 15 named image fields: image_0 ... image_14
 const uploadFields = upload.fields([
   { name: "project_file", maxCount: 1 },
   ...Array.from({ length: 15 }, (_, i) => ({ name: `image_${i}`, maxCount: 1 })),
