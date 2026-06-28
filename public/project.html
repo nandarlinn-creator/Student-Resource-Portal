@@ -16,6 +16,23 @@
     .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:0.85rem; margin-bottom:28px; transition:color 0.2s; }
     .back-link:hover { color:var(--text); }
     .project-hero { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; margin-bottom:28px; }
+
+    /* ── Cover banner (above hero card) ── */
+    .hero-cover-banner {
+      width: 100%;
+      max-height: 360px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+    .hero-cover-banner img {
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      display: block;
+    }
     .hero-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
     .hero-title { font-family:var(--font-head); font-size:2rem; font-weight:800; letter-spacing:-0.02em; line-height:1.15; }
     .hero-meta { display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-size:0.82rem; color:var(--muted); margin-bottom:20px; }
@@ -148,8 +165,15 @@
 
     document.title = p.title + ' — UniPortal';
 
+    const coverImage = (images && images.length > 0) ? images[0] : null;
+    const coverBanner = coverImage
+      ? '<div class="hero-cover-banner"><img src="' + coverImage + '" alt="' + esc(p.title) + '" onerror="this.parentElement.style.display=\'none\'" /></div>'
+      : '';
+
     document.getElementById('mainContent').innerHTML =
       '<a href="/projects" class="back-link">← Back to Projects</a>' +
+
+      coverBanner +
 
       '<div class="project-hero fade-up">' +
         '<div class="hero-top">' +
@@ -289,4 +313,3 @@
   </script>
 </body>
 </html>
-

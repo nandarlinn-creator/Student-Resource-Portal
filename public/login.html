@@ -85,13 +85,50 @@
 
     /* ── Right panel ── */
     .auth-visual {
+      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 60px;
-      background: var(--card);
+      background: var(--bg);
       gap: 32px;
+      overflow: hidden;
+    }
+
+    /* ── Background photo collage (atmosphere only, not literal preview) ── */
+    .collage-bg {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 1fr;
+      gap: 2px;
+      z-index: 0;
+    }
+    .collage-bg .tile {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+    .collage-bg .tile img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(0.7) brightness(0.55);
+      transform: scale(1.05);
+    }
+    .collage-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center, rgba(10,14,26,0.55) 0%, rgba(10,14,26,0.88) 70%, rgba(10,14,26,0.97) 100%);
+      z-index: 1;
+    }
+    .auth-visual > .stat-grid,
+    .auth-visual > .visual-quote {
+      position: relative;
+      z-index: 2;
     }
 
     .stat-grid {
@@ -208,22 +245,19 @@
 
       <!-- Visual Panel -->
       <div class="auth-visual">
+        <div class="collage-bg" id="collageBg">
+          <!-- Populated by JS with real approved project images, tiled and dimmed -->
+        </div>
+        <div class="collage-overlay"></div>
+
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="num">2.4k</div>
-            <div class="lbl">Projects Uploaded</div>
+            <div class="num" id="statProjects">—</div>
+            <div class="lbl">Approved Projects</div>
           </div>
           <div class="stat-card">
-            <div class="num">840</div>
-            <div class="lbl">Active Students</div>
-          </div>
-          <div class="stat-card">
-            <div class="num">120</div>
-            <div class="lbl">Faculty Members</div>
-          </div>
-          <div class="stat-card">
-            <div class="num">98%</div>
-            <div class="lbl">Uptime</div>
+            <div class="num" id="statContributors">—</div>
+            <div class="lbl">Contributors</div>
           </div>
         </div>
         <div class="visual-quote">
@@ -235,5 +269,52 @@
   </div>
 
   <script src="/js/auth.js"></script>
+  <script>
+    // Pull real, live counts — no placeholder numbers
+    fetch('/auth/public-stats', { headers: { 'Accept': 'application/json' } })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('statProjects').textContent     = data.approvedProjects ?? '0';
+        document.getElementById('statContributors').textContent = data.contributors ?? '0';
+      })
+      .catch(() => {
+        document.getElementById('statProjects').textContent     = '0';
+        document.getElementById('statContributors').textContent = '0';
+      });
+
+    // Build a tiled background collage from real project images — atmosphere only,
+    // heavily dimmed/blurred via CSS so it never reads as a literal content preview.
+    fetch('/auth/public-preview', { headers: { 'Accept': 'application/json' } })
+      .then(res => res.json())
+      .then(data => {
+        const collage = document.getElementById('collageBg');
+        const projects = data.projects || [];
+
+        // Gather every available image across all returned projects
+        let allImages = [];
+        projects.forEach(p => {
+          if (Array.isArray(p.images)) allImages = allImages.concat(p.images);
+        });
+
+        if (allImages.length === 0) {
+          collage.style.display = 'none';
+          return;
+        }
+
+        // Fill a fixed number of tiles, repeating images if there aren't enough
+        const TILE_COUNT = 8;
+        const tiles = [];
+        for (let i = 0; i < TILE_COUNT; i++) {
+          tiles.push(allImages[i % allImages.length]);
+        }
+
+        collage.innerHTML = tiles.map(src =>
+          `<div class="tile"><img src="${src}" alt="" loading="lazy" onerror="this.parentElement.remove()" /></div>`
+        ).join('');
+      })
+      .catch(() => {
+        document.getElementById('collageBg').style.display = 'none';
+      });
+  </script>
 </body>
 </html>

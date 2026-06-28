@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — Student Resource Portal</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .main-wrap { flex:1; display:grid; grid-template-columns:240px 1fr; min-height:calc(100vh - 69px); }
+    aside { border-right:1px solid var(--border); padding:28px 16px; background:var(--card); position:sticky; top:69px; height:calc(100vh - 69px); overflow-y:auto; }
+    .sidebar-label { font-size:0.7rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:0 12px; margin-bottom:8px; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; text-decoration:none; color:var(--muted); font-size:0.88rem; transition:all 0.2s; margin-bottom:2px; }
+    .sidebar-link:hover { background:var(--border); color:var(--text); }
+    .sidebar-link.active { background:rgba(59,130,246,0.12); color:var(--accent); }
+    .content { padding:48px; max-width:760px; }
+
+    .page-header { margin-bottom:32px; }
+    .page-header h1 { font-family:var(--font-head); font-size:2rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; }
+    .page-header p { color:var(--muted); font-size:0.92rem; }
+
+    /* ── Profile hero ── */
+    .profile-hero {
+      background:var(--card); border:1px solid var(--border); border-radius:16px;
+      padding:32px; margin-bottom:24px; display:flex; align-items:center; gap:20px;
+    }
+    .profile-avatar {
+      width:72px; height:72px; border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.6rem; font-weight:800; color:#fff; flex-shrink:0;
+    }
+    .profile-name { font-family:var(--font-head); font-size:1.4rem; font-weight:800; margin-bottom:4px; }
+    .profile-email { color:var(--muted); font-size:0.88rem; margin-bottom:8px; }
+    .role-badge {
+      display:inline-block; padding:3px 12px; border-radius:99px;
+      font-size:0.75rem; font-weight:600; text-transform:capitalize;
+      background:rgba(59,130,246,0.15); color:var(--accent);
+    }
+    .role-badge.admin   { background:rgba(239,68,68,0.15);  color:var(--danger); }
+    .role-badge.faculty { background:rgba(16,185,129,0.15); color:var(--success); }
+
+    /* ── Stats row ── */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+    .stat-tile { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; text-align:center; }
+    .stat-num { font-family:var(--font-head); font-size:1.8rem; font-weight:800; margin-bottom:4px; }
+    .stat-lbl { font-size:0.78rem; color:var(--muted); font-weight:500; }
+
+    /* ── Section card ── */
+    .section-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:28px; margin-bottom:20px; }
+    .section-title { font-family:var(--font-head); font-size:1rem; font-weight:700; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+
+    /* ── My projects list ── */
+    .my-project-row {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding:14px 0; border-bottom:1px solid var(--border);
+      text-decoration:none; color:inherit; transition:background 0.15s;
+    }
+    .my-project-row:last-child { border-bottom:none; }
+    .my-project-row:hover { background:rgba(255,255,255,0.02); }
+    .mp-left { display:flex; align-items:center; gap:12px; min-width:0; }
+    .mp-icon {
+      width:38px; height:38px; border-radius:9px;
+      background:rgba(59,130,246,0.12); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+    }
+    .mp-title { font-size:0.9rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mp-date { font-size:0.76rem; color:var(--muted); }
+    .empty-projects { text-align:center; padding:32px; color:var(--muted); font-size:0.88rem; }
+
+    /* ── Password form ── */
+    .form-row { display:grid; gap:16px; max-width:420px; }
+
+    .loading-state { text-align:center; padding:60px; color:var(--muted); }
+    .loading-spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto 14px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    @media (max-width:768px) {
+      .main-wrap { grid-template-columns:1fr; }
+      aside { display:none; }
+      .content { padding:24px 16px; }
+      .stats-row { grid-template-columns:1fr; }
+      .profile-hero { flex-direction:column; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="page-wrap">
+    <nav>
+      <a href="/" class="nav-logo"><span></span>UniPortal</a>
+      <div class="nav-links">
+        <a href="/projects">Browse Projects</a>
+        <button class="btn-nav-primary" onclick="logout()">Sign Out</button>
+      </div>
+    </nav>
+    <div class="main-wrap">
+      <aside>
+        <div style="margin-bottom:28px;">
+          <p class="sidebar-label">Navigation</p>
+          <a href="/projects" class="sidebar-link"><span>📁</span> All Projects</a>
+          <a href="/projects/upload" class="sidebar-link"><span>⬆️</span> Upload Project</a>
+        </div>
+        <div>
+          <p class="sidebar-label">Account</p>
+          <a href="/profile" class="sidebar-link active"><span>👤</span> My Profile</a>
+          <a href="#" class="sidebar-link" onclick="logout();return false;"><span>🚪</span> Sign Out</a>
+        </div>
+      </aside>
+
+      <main class="content" id="mainContent">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading profile...</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+<script>
+  async function loadProfile() {
+    try {
+      const res  = await fetch('/profile/api/me', { headers: { 'Accept': 'application/json' } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load profile');
+      renderProfile(data);
+    } catch (err) {
+      document.getElementById('mainContent').innerHTML =
+        '<div class="loading-state"><p>Error: ' + esc(err.message) + '</p></div>';
+    }
+  }
+
+  function renderProfile(data) {
+    const user = data.user;
+    const projects = data.projects || [];
+    const av = initials(user.name);
+
+    const approved = projects.filter(p => p.status === 'approved').length;
+    const pending  = projects.filter(p => p.status === 'pending').length;
+
+    document.getElementById('mainContent').innerHTML = `
+      <div class="page-header fade-up">
+        <h1>My Profile</h1>
+        <p>Manage your account and view your submitted projects.</p>
+      </div>
+
+      <div class="profile-hero fade-up delay-1">
+        <div class="profile-avatar">${av}</div>
+        <div>
+          <div class="profile-name">${esc(user.name)}</div>
+          <div class="profile-email">${esc(user.email)}</div>
+          <span class="role-badge ${user.role}">${esc(user.role)}</span>
+        </div>
+      </div>
+
+      <div class="stats-row fade-up delay-2">
+        <div class="stat-tile"><div class="stat-num">${projects.length}</div><div class="stat-lbl">Total Submitted</div></div>
+        <div class="stat-tile"><div class="stat-num">${approved}</div><div class="stat-lbl">Approved</div></div>
+        <div class="stat-tile"><div class="stat-num">${pending}</div><div class="stat-lbl">Pending Review</div></div>
+      </div>
+
+      <div class="section-card fade-up delay-3">
+        <div class="section-title">📁 My Projects</div>
+        ${renderMyProjects(projects)}
+      </div>
+
+      <div class="section-card fade-up delay-3">
+        <div class="section-title">🔒 Change Password</div>
+        <div class="alert alert-error"   id="pwError"   style="display:none;"><span>⚠</span><span id="pwErrorMsg"></span></div>
+        <div class="alert alert-success" id="pwSuccess" style="display:none;"><span>✓</span><span>Password updated successfully.</span></div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0;">
+            <label for="currentPw">Current Password</label>
+            <input type="password" id="currentPw" placeholder="••••••••" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label for="newPw">New Password</label>
+            <input type="password" id="newPw" placeholder="Min. 8 characters" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label for="confirmPw">Confirm New Password</label>
+            <input type="password" id="confirmPw" placeholder="Repeat new password" />
+          </div>
+          <button class="btn btn-primary" style="width:fit-content;" onclick="changePassword()">Update Password</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderMyProjects(projects) {
+    if (!projects.length) {
+    return '<div class="empty-projects">You have not submitted any projects yet. <a href="/projects/upload" style="color:var(--accent);">Upload one now</a>.</div>';
+    }
+    return projects.map(p => {
+      const date = p.created_at ? new Date(p.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '';
+      return `
+        <a href="/projects/${p.id}" class="my-project-row">
+          <div class="mp-left">
+            <div class="mp-icon">📄</div>
+            <div>
+              <div class="mp-title">${esc(p.title)}</div>
+              <div class="mp-date">${date}</div>
+            </div>
+          </div>
+          <span class="badge badge-${p.status}">${p.status}</span>
+        </a>`;
+    }).join('');
+  }
+
+  async function changePassword() {
+    const current = document.getElementById('currentPw').value;
+    const next     = document.getElementById('newPw').value;
+    const confirm  = document.getElementById('confirmPw').value;
+
+    document.getElementById('pwError').style.display   = 'none';
+    document.getElementById('pwSuccess').style.display = 'none';
+
+    if (!current || !next || !confirm) return showPwError('Please fill in all fields.');
+    if (next.length < 8) return showPwError('New password must be at least 8 characters.');
+    if (next !== confirm) return showPwError('Passwords do not match.');
+
+    try {
+      const res = await fetch('/profile/api/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: current, newPassword: next }),
+      });
+      const data = await res.json();
+      if (!res.ok) return showPwError(data.error || 'Failed to update password.');
+
+      document.getElementById('pwSuccess').style.display = 'flex';
+      document.getElementById('currentPw').value = '';
+      document.getElementById('newPw').value = '';
+      document.getElementById('confirmPw').value = '';
+    } catch (err) {
+      showPwError('Network error. Please try again.');
+    }
+  }
+
+  function showPwError(msg) {
+    const el = document.getElementById('pwError');
+    document.getElementById('pwErrorMsg').textContent = msg;
+    el.style.display = 'flex';
+  }
+
+  function initials(name) {
+    return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  }
+  function esc(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  async function logout() {
+    await fetch('/auth/logout', { method: 'POST' });
+    window.location.href = '/auth/login';
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>

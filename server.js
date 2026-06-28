@@ -8,6 +8,7 @@ const { sequelize } = require("./config/database");
 const authRoutes    = require("./routes/authRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const adminRoutes   = require("./routes/adminRoutes");
+const profileRoutes = require("./routes/profileRoutes");
 const { requireAuth } = require("./middleware/authMiddleware");
 
 const app  = express();
@@ -41,6 +42,7 @@ sessionStore.sync();
 app.use("/auth",     authRoutes);
 app.use("/projects", requireAuth, projectRoutes);
 app.use("/admin",    adminRoutes);
+app.use("/profile",  requireAuth, profileRoutes);
 
 // Root redirect
 app.get("/", (req, res) => {
@@ -59,15 +61,32 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
-// ── Start ──────────────────────────────────────────────────────
+// ── Start (with retry on transient DB connection failures) ──────
+async function connectWithRetry(retries = 5, delayMs = 3000) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await sequelize.authenticate();
+      console.log("Database connection established.");
+      return true;
+    } catch (err) {
+      console.error(`DB connection attempt ${attempt}/${retries} failed:`, err.message);
+      if (attempt === retries) return false;
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+}
+
 (async () => {
+  const connected = await connectWithRetry();
+  if (!connected) {
+    console.error("Unable to connect to database after retries. Exiting.");
+    process.exit(1);
+  }
   try {
-    await sequelize.authenticate();
-    console.log("Database connection established.");
     await sequelize.sync({ alter: true });
     app.listen(PORT, () => console.log("Server running on http://localhost:" + PORT));
   } catch (err) {
-    console.error("Unable to connect to database:", err.message);
+    console.error("Startup error after DB connect:", err.message);
     process.exit(1);
   }
 })();

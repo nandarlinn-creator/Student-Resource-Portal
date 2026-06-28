@@ -36,4 +36,10 @@ router.post("/register", redirectIfAuth, registerValidation, authController.post
 // POST /auth/logout
 router.post("/logout", authController.logout);
 
+// GET /auth/public-stats (no auth required — used on login page)
+router.get("/public-stats", authController.getPublicStats);
+
+// GET /auth/public-preview (no auth required — used on login page)
+router.get("/public-preview", authController.getPublicPreview);
+
 module.exports = router;

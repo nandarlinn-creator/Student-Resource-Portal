@@ -18,6 +18,10 @@
       border-right: 1px solid var(--border);
       padding: 32px 20px;
       background: var(--card);
+      position: sticky;
+      top: 69px;
+      height: calc(100vh - 69px);
+      overflow-y: auto;
     }
     .sidebar-section { margin-bottom: 32px; }
     .sidebar-label {
@@ -131,27 +135,71 @@
     /* ── Project Grid ── */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 1100px) {
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .projects-grid { grid-template-columns: 1fr; }
     }
 
     .project-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 24px;
+      overflow: hidden;
       transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
       cursor: pointer;
       text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
-      gap: 12px;
     }
     .project-card:hover {
       border-color: var(--accent);
       transform: translateY(-2px);
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* ── Cover image (leads the card) ── */
+    .project-cover {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--bg2);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .project-cover img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s;
+    }
+    .project-card:hover .project-cover img {
+      transform: scale(1.04);
+    }
+    .project-cover-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem;
+      background: linear-gradient(135deg, rgba(59,130,246,0.10), rgba(6,182,212,0.10));
+      color: var(--muted);
+    }
+    .project-cover-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      z-index: 2;
+    }
+
+    .project-card-body {
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
     }
 
     .project-card-top {
@@ -208,6 +256,23 @@
       font-weight: 700;
       color: white;
       flex-shrink: 0;
+    }
+
+    /* ── Tech tag chips (search preview) ── */
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 2px;
+    }
+    .tech-tag {
+      background: rgba(59,130,246,0.12);
+      color: var(--accent);
+      border-radius: 99px;
+      padding: 2px 9px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      white-space: nowrap;
     }
 
     /* ── Empty State ── */
@@ -286,7 +351,7 @@
         </div>
         <div class="sidebar-section">
           <p class="sidebar-label">Account</p>
-          <a href="#" class="sidebar-link">
+          <a href="/profile" class="sidebar-link">
             <span class="icon">👤</span> My Profile
           </a>
           <a href="#" class="sidebar-link" onclick="logout(); return false;">
@@ -336,7 +401,7 @@
         <div class="toolbar fade-up delay-2">
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search projects..." oninput="filterProjects()" />
+            <input type="text" id="searchInput" placeholder="Search by title, language, framework, or device..." oninput="filterProjects()" />
           </div>
           <select class="filter-select" id="sortSelect" onchange="filterProjects()">
             <option value="newest">Newest First</option>
@@ -430,11 +495,7 @@
       const query = document.getElementById('searchInput').value.toLowerCase();
       const sort  = document.getElementById('sortSelect').value;
 
-      let filtered = allProjects.filter(p =>
-        p.title.toLowerCase().includes(query) ||
-        (p.description || '').toLowerCase().includes(query) ||
-        (p.uploader?.name || '').toLowerCase().includes(query)
-      );
+      let filtered = allProjects.filter(p => matchesQuery(p, query));
 
       if (sort === 'newest') filtered.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
       if (sort === 'oldest') filtered.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
@@ -442,6 +503,49 @@
       if (sort === 'za')     filtered.sort((a,b) => b.title.localeCompare(a.title));
 
       renderProjects(filtered);
+    }
+
+    /* ── Search across title, description, uploader, and all requirement fields ── */
+    function matchesQuery(p, query) {
+      if (!query) return true;
+
+      const req = p.requirements || {};
+      const sw  = req.software   || {};
+      const hw  = req.hardware   || [];
+      const net = req.networking || [];
+
+      const haystack = [
+        p.title,
+        p.description,
+        p.uploader?.name,
+        ...(sw.languages  || []),
+        ...(sw.frameworks || []),
+        ...(sw.databases  || []),
+        ...(sw.other      || []),
+        ...hw.map(h => h.name),
+        ...hw.map(h => h.category),
+        ...net.map(n => n.name),
+        ...net.map(n => n.category),
+      ].filter(Boolean).join(' ').toLowerCase();
+
+      return haystack.includes(query);
+    }
+
+    /* ── Collect a short tag preview for the card (max 4 tags) ── */
+    function getTechTags(p) {
+      const req = p.requirements || {};
+      const sw  = req.software   || {};
+      const hw  = req.hardware   || [];
+      const net = req.networking || [];
+
+      const tags = [
+        ...(sw.languages  || []),
+        ...(sw.frameworks || []),
+        ...(sw.databases  || []),
+        ...hw.map(h => h.name).filter(Boolean),
+        ...net.map(n => n.name).filter(Boolean),
+      ];
+      return tags.slice(0, 4);
     }
 
     function renderProjects(projects) {
@@ -470,26 +574,38 @@
         card.className = 'project-card';
         card.href = `/projects/${project.id}`;
 
-        const author    = project.uploader?.name || 'Unknown';
-        const date      = project.created_at ? timeAgo(project.created_at) : '';
-        const fileIcon  = getIcon(project.file_name);
-        const avatarTxt = initials(author);
+        const author     = project.uploader?.name || 'Unknown';
+        const date        = project.created_at ? timeAgo(project.created_at) : '';
+        const fileIcon     = getIcon(project.file_name);
+        const avatarTxt    = initials(author);
+        const techTags    = getTechTags(project);
+        const coverImage  = (project.images && project.images.length > 0) ? project.images[0] : null;
+
+        const coverHtml = coverImage
+          ? `<img src="${coverImage}" alt="${escapeHtml(project.title)}" loading="lazy"
+               onerror="this.parentElement.innerHTML='<div class=&quot;project-cover-placeholder&quot;>${fileIcon}</div>'" />`
+          : `<div class="project-cover-placeholder">${fileIcon}</div>`;
 
         card.innerHTML = `
-          <div class="project-card-top">
-            <div class="project-file-icon">${fileIcon}</div>
-            <span class="badge badge-${project.status}">${project.status}</span>
+          <div class="project-cover">
+            ${coverHtml}
+            <span class="badge badge-${project.status} project-cover-badge">${project.status}</span>
           </div>
-          <div class="project-title">${escapeHtml(project.title)}</div>
-          ${project.description
-            ? `<div class="project-desc">${escapeHtml(project.description)}</div>`
-            : ''}
-          <div class="project-meta">
-            <div class="project-author">
-              <div class="author-avatar">${avatarTxt}</div>
-              <span>${escapeHtml(author)}</span>
+          <div class="project-card-body">
+            <div class="project-title">${escapeHtml(project.title)}</div>
+            ${project.description
+              ? `<div class="project-desc">${escapeHtml(project.description)}</div>`
+              : ''}
+            ${techTags.length
+              ? `<div class="tech-tags">${techTags.map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`).join('')}</div>`
+              : ''}
+            <div class="project-meta">
+              <div class="project-author">
+                <div class="author-avatar">${avatarTxt}</div>
+                <span>${escapeHtml(author)}</span>
+              </div>
+              <span>${date}</span>
             </div>
-            <span>${date}</span>
           </div>
         `;
         grid.appendChild(card);
@@ -511,4 +627,3 @@
   </script>
 </body>
 </html>
-
