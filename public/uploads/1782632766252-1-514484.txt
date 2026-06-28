@@ -1,0 +1,41 @@
+# Serverless Image Blurring 
+
+## Overview
+An event-driven, serverless application built on AWS that automatically detects and blurs images uploaded to an S3 bucket. This project demonstrates core cloud automation concepts, utilizing AWS Lambda for lightweight, scalable compute and S3 event notifications for seamless trigger integration.
+
+## Architecture
+- **Amazon S3 (Source Bucket):** Acts as the ingestion point. Users upload raw images here.
+- **S3 Event Notifications:** Detects `ObjectCreated` events and triggers the Lambda function.
+- **AWS Lambda:** The core compute layer. It downloads the image, applies a blurring algorithm (via libraries like Pillow or OpenCV), and prepares the output.
+- **Amazon S3 (Destination Bucket):** Stores the processed, blurred images securely.
+- **AWS IAM:** Enforces least-privilege access, allowing Lambda to read from the source bucket and write to the destination bucket.
+- **Amazon CloudWatch:** Captures execution logs and metrics for monitoring and troubleshooting.
+
+## Step-by-Step Walkthrough
+
+### 1. Create S3 Buckets
+- Create two separate buckets (e.g., `raw-images-bucket` and `blurred-images-bucket`).
+- Ensure both buckets are in the same AWS Region.
+
+### 2. Configure IAM Execution Role
+- Go to IAM → Roles → Create role.
+- Select **AWS service** → **Lambda**.
+- Attach the `AWSLambdaBasicExecutionRole` policy.
+- Add an inline policy granting `s3:GetObject` on the source bucket and `s3:PutObject` on the destination bucket.
+
+### 3. Deploy the Lambda Function
+- Create a new Lambda function using your preferred runtime (e.g., Python 3.x).
+- Assign the IAM role created in Step 2.
+- Package your application code along with necessary dependencies (like Pillow/PIL) into a `.zip` deployment package or a container image.
+- Upload the deployment package to Lambda.
+
+### 4. Set Up the Event Trigger
+- Go to the **Source S3 Bucket** → Properties → Event Notifications.
+- Create a new event notification.
+- Event type: `All object create events`.
+- Destination: Select the Lambda function deployed in Step 3.
+
+### 5. Test the Pipeline
+- Upload a standard `.jpg` or `.png` file to the source bucket.
+- Verify the successful execution in CloudWatch Logs.
+- Check the destination bucket for the correctly blurred output image.

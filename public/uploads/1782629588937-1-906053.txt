@@ -1,0 +1,106 @@
+# Jenkins CI/CD Pipeline: Docker Image Build, ECR Push, and Trivy Scan
+
+## Overview
+Automates containerizing an application, scanning it for known vulnerabilities, and publishing it to AWS ECR. Built for development and lab environments where rapid iteration and security checks matter.
+
+## Architecture
+- **Jenkins Server** — orchestrates the build and deployment process
+- **Jenkins Agent** — executes the Docker build, ECR push, and Trivy scan commands
+- **AWS ECR** — securely stores the Docker images
+- **Trivy** — open-source vulnerability scanner for container images
+
+## Step-by-Step Walkthrough
+
+### 1. Launch Jenkins Server Instance
+- Instance Type: `t2.small`
+- OS: Ubuntu
+- Security Group: allow ports `22` (SSH) and `8080` (Jenkins UI)
+
+### 2. Launch Jenkins Agent Instance
+- Instance Type: `t2.medium`
+- OS: Ubuntu
+- Security Group: allow port `22` (SSH)
+
+### 3. Install Java and Jenkins
+On both Server and Agent — install Java, then install Jenkins.
+
+### 4. Access Jenkins and Install Recommended Plugins
+1. Open `http://<Jenkins_Server_Public_IP>:8080`
+2. Unlock Jenkins using the initial admin password from `/var/lib/jenkins/secrets/initialAdminPassword`
+3. Choose "Install suggested plugins"
+
+**On Jenkins Agent** — generate an SSH key pair:
+```bash
+ssh-keygen
+```
+Copy the public key into `authorized_keys`, and keep the private key for the next step.
+
+**In Jenkins UI:**
+1. Dashboard → Manage Jenkins → Manage Credentials
+2. (global) → Add Credentials
+3. Kind: SSH Username with private key, Scope: Global
+4. Username: `ubuntu` (or your agent user)
+5. Private Key: paste the key generated above
+6. Click OK
+
+### 5. Add Jenkins Agent Node
+1. Manage Jenkins → Manage Nodes and Clouds → New Node
+2. Name it (e.g. `jenkins-agent-1`), select Permanent Agent
+3. Configure:
+   - Executors: `1`
+   - Remote root directory: `/home/ubuntu/jenkins_workspace`
+   - Labels: `important` (used in the Jenkinsfile)
+   - Launch method: Launch agents via SSH
+   - Host: Agent's private IP
+   - Credentials: the SSH credential created above
+   - Host Key Verification Strategy: Non-verifying (lab environment only)
+
+### 6. Install unzip, AWS CLI, and Trivy on the Agent
+```bash
+sudo apt install unzip -y
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+rm -rf awscliv2.zip aws
+```
+Install Trivy following the project's `installation.txt`.
+
+**Create an IAM Role:**
+1. IAM → Roles → Create role
+2. Trusted entity: AWS service → EC2
+3. Attach policy: `AmazonEC2ContainerRegistryFullAccess`
+4. Name it (e.g. `JenkinsAgentECRRole`) and create
+
+**Attach the role to the Agent EC2 instance:**
+EC2 Console → select instance → Actions → Security → Modify IAM role → select the role → Update.
+
+### 7. Docker Environment Setup on the Agent
+```bash
+sudo su -
+usermod -aG docker ubuntu
+usermod -aG docker jenkins
+```
+
+### 8. Create an ECR Repository
+ECR Dashboard → Create Private Repository → name it → copy the repository URL.
+
+### 9. Update the Jenkinsfile
+In the repo, edit `Jenkinsfile`:
+- Replace the agent `label` if changed
+- Replace the ECR repository URL
+- Replace the desired image name
+
+### 10. Set Up a New Jenkins Pipeline Item
+1. Dashboard → New Item → name it (e.g. `DockerPipeline`) → select Pipeline
+2. Definition: Pipeline script from SCM
+3. SCM: Git
+4. Repository URL: your GitHub repo URL
+5. Branch: `*/main`
+6. Script Path: `Jenkinsfile`
+7. Save
+
+### 11. Trigger the Build
+Open the pipeline item → click **Build Now** → monitor progress under Build History.
+
+## Source
+Full repository: https://github.com/pyaesoekyaw/docker-beginner-lab

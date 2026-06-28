@@ -3,384 +3,343 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Upload Project — Student Resource Portal</title>
+  <title>Upload Project — UniPortal</title>
   <link rel="stylesheet" href="/css/style.css" />
   <style>
-    .main-wrap { flex:1; display:grid; grid-template-columns:240px 1fr; min-height:calc(100vh - 69px); }
-    aside { border-right:1px solid var(--border); padding:28px 16px; background:var(--card); position:sticky; top:69px; height:calc(100vh - 69px); overflow-y:auto; }
-    .sidebar-label { font-size:0.7rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:0 12px; margin-bottom:8px; }
-    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; text-decoration:none; color:var(--muted); font-size:0.88rem; transition:all 0.2s; margin-bottom:2px; }
-    .sidebar-link:hover { background:var(--border); color:var(--text); }
-    .sidebar-link.active { background:rgba(59,130,246,0.12); color:var(--accent); }
-    .content { padding:40px 48px; max-width:920px; }
+    .shell { max-width: 920px; }
 
-    /* Header */
-    .page-header { margin-bottom:28px; }
-    .page-header h1 { font-family:var(--font-head); font-size:2rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; }
-    .page-header p { color:var(--muted); font-size:0.92rem; }
+    .page-header { margin-bottom: 26px; }
+    .page-header h1 { font-family: var(--font-head); font-size: 1.9rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--ink); }
+    .page-header p { color: var(--muted); font-size: 0.92rem; }
 
-    /* Checklist */
-    .checklist { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:24px; }
-    .check-item { display:flex; align-items:center; gap:6px; font-size:0.82rem; }
-    .check-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background 0.3s; }
-    .check-dot.done { background:var(--success); }
-    .check-text { color:var(--muted); transition:color 0.3s; }
-    .check-item.done .check-text { color:var(--text); }
+    .checklist { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
+    .check-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; }
+    .check-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
+    .check-dot.done { background: var(--success); }
+    .check-text { color: var(--muted); font-weight: 600; transition: color 0.3s; }
+    .check-item.done .check-text { color: var(--ink); }
 
-    /* Steps */
-    .steps { display:flex; align-items:center; margin-bottom:28px; }
-    .step { display:flex; align-items:center; gap:10px; cursor:pointer; padding:10px 14px; border-radius:10px; transition:background 0.2s; flex-shrink:0; }
-    .step:hover { background:var(--border); }
-    .step-num { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; border:2px solid var(--border); color:var(--muted); background:var(--bg2); transition:all 0.3s; flex-shrink:0; }
-    .step-label { font-size:0.7rem; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:0.06em; }
-    .step-title { font-size:0.88rem; font-weight:600; color:var(--text); }
-    .step.active .step-num { background:var(--accent); border-color:var(--accent); color:#fff; }
-    .step.done   .step-num { background:var(--success); border-color:var(--success); color:#fff; }
-    .step-connector { flex:1; height:1px; background:var(--border); min-width:16px; }
+    .steps { display: flex; align-items: center; margin-bottom: 26px; }
+    .step { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 14px; border-radius: 10px; transition: background 0.15s; flex-shrink: 0; }
+    .step:hover { background: var(--bg-soft); }
+    .step-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; border: 2px solid var(--border); color: var(--muted); background: var(--white); transition: all 0.3s; flex-shrink: 0; }
+    .step-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .step-title { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
+    .step.active .step-num { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .step.done   .step-num { background: var(--success); border-color: var(--success); color: #fff; }
+    .step-connector { flex: 1; height: 1px; background: var(--border); min-width: 16px; }
 
-    /* Title card */
-    .title-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:24px; }
+    .title-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
 
-    /* Panels */
-    .panel { display:none; }
-    .panel.active { display:block; animation:fadeUp 0.35s ease; }
-    .panel-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
-    .panel-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
-    .panel-icon.blue  { background:rgba(59,130,246,0.15); }
-    .panel-icon.green { background:rgba(16,185,129,0.15); }
-    .panel-icon.amber { background:rgba(245,158,11,0.15); }
-    .panel-header h2 { font-family:var(--font-head); font-size:1.3rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:2px; }
-    .panel-header p  { font-size:0.84rem; color:var(--muted); }
+    .panel { display: none; }
+    .panel.active { display: block; animation: fadeUp 0.3s ease; }
+    .panel-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .panel-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .panel-icon.blue  { background: #DBEAFE; }
+    .panel-icon.green { background: var(--success-bg); }
+    .panel-icon.amber { background: var(--warning-bg); }
+    .panel-header h2 { font-family: var(--font-head); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 2px; color: var(--ink); }
+    .panel-header p  { font-size: 0.84rem; color: var(--muted); }
 
-    /* Section cards */
-    .section-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px; }
-    .section-card h3 { font-family:var(--font-head); font-size:0.95rem; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .section-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
+    .section-card h3 { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border); color: var(--ink); }
 
-    /* Image slots */
-    .image-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
-    .img-slot { aspect-ratio:16/10; border:2px dashed var(--border); border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; position:relative; overflow:hidden; transition:all 0.2s; background:var(--bg2); }
-    .img-slot:hover { border-color:var(--accent); background:rgba(59,130,246,0.05); }
-    .img-slot input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-    .img-slot .slot-icon { font-size:1.4rem; pointer-events:none; }
-    .img-slot .slot-label { font-size:0.7rem; color:var(--muted); font-weight:500; text-align:center; padding:0 8px; pointer-events:none; }
-    .img-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:8px; }
-    .img-slot .img-remove { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.75); border:none; color:#fff; border-radius:50%; width:22px; height:22px; display:none; align-items:center; justify-content:center; font-size:0.7rem; cursor:pointer; z-index:2; }
-    .img-slot:hover .img-remove { display:flex; }
-    .add-more-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px dashed var(--border); background:none; color:var(--muted); font-size:0.8rem; cursor:pointer; transition:all 0.2s; }
-    .add-more-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .image-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 12px; }
+    .img-slot { aspect-ratio: 16/10; border: 2px dashed var(--border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; position: relative; overflow: hidden; transition: all 0.15s; background: var(--bg-soft); }
+    .img-slot:hover { border-color: var(--primary); background: #EFF6FF; }
+    .img-slot input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .img-slot .slot-icon { font-size: 1.3rem; pointer-events: none; }
+    .img-slot .slot-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-align: center; padding: 0 8px; pointer-events: none; }
+    .img-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .img-slot .img-remove { position: absolute; top: 6px; right: 6px; background: rgba(17,24,39,0.75); border: none; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: none; align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer; z-index: 2; }
+    .img-slot:hover .img-remove { display: flex; }
+    .add-more-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px dashed var(--border); background: none; color: var(--muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .add-more-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-    /* Tag input */
-    .tag-input-wrap { border:1px solid var(--border); border-radius:10px; padding:8px 12px; background:var(--bg2); display:flex; flex-wrap:wrap; gap:6px; cursor:text; min-height:46px; transition:border-color 0.2s; }
-    .tag-input-wrap:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,246,0.15); }
-    .tag { display:inline-flex; align-items:center; gap:4px; background:rgba(59,130,246,0.15); color:var(--accent); border-radius:6px; padding:3px 8px; font-size:0.8rem; font-weight:500; }
-    .tag button { background:none; border:none; color:var(--accent); cursor:pointer; padding:0; font-size:0.85rem; }
-    .tag-real-input { border:none; background:none; outline:none; color:var(--text); font-family:var(--font-body); font-size:0.9rem; min-width:100px; flex:1; padding:2px 0; }
-    .tag-hint { font-size:0.74rem; color:var(--muted); margin-top:5px; }
+    .tag-input-wrap { border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; background: var(--white); display: flex; flex-wrap: wrap; gap: 6px; cursor: text; min-height: 46px; transition: border-color 0.15s; }
+    .tag-input-wrap:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    .tag { display: inline-flex; align-items: center; gap: 4px; background: #EFF6FF; color: var(--primary); border-radius: 6px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; }
+    .tag button { background: none; border: none; color: var(--primary); cursor: pointer; padding: 0; font-size: 0.85rem; }
+    .tag-real-input { border: none; background: none; outline: none; color: var(--ink); font-family: var(--font-body); font-size: 0.9rem; min-width: 100px; flex: 1; padding: 2px 0; }
+    .tag-hint { font-size: 0.74rem; color: var(--muted); margin-top: 5px; }
 
-    /* Req rows */
-    .col-headers { display:grid; gap:10px; margin-bottom:6px; }
-    .col-headers.three-col { grid-template-columns:150px 1fr 100px 36px; }
-    .col-headers span { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); padding-left:4px; }
-    .req-row { display:grid; gap:10px; margin-bottom:10px; align-items:start; }
-    .req-row.three-col { grid-template-columns:150px 1fr 100px auto; }
-    .req-row input,.req-row select { margin-bottom:0; }
-    .btn-remove-row { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:var(--danger); border-radius:8px; padding:9px 10px; cursor:pointer; font-size:0.85rem; transition:all 0.2s; }
-    .btn-remove-row:hover { background:rgba(239,68,68,0.2); }
-    .btn-add-row { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px dashed var(--border); background:none; color:var(--muted); font-size:0.8rem; cursor:pointer; transition:all 0.2s; margin-top:6px; }
-    .btn-add-row:hover { border-color:var(--accent); color:var(--accent); }
+    .col-headers { display: grid; gap: 10px; margin-bottom: 6px; }
+    .col-headers.three-col { grid-template-columns: 150px 1fr 100px 36px; }
+    .col-headers span { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding-left: 4px; }
+    .req-row { display: grid; gap: 10px; margin-bottom: 10px; align-items: start; }
+    .req-row.three-col { grid-template-columns: 150px 1fr 100px auto; }
+    .req-row input,.req-row select { margin-bottom: 0; }
+    .btn-remove-row { background: var(--danger-bg); border: 1px solid #FECACA; color: var(--danger); border-radius: 8px; padding: 9px 10px; cursor: pointer; font-size: 0.85rem; transition: all 0.15s; }
+    .btn-remove-row:hover { background: #FECACA; }
+    .btn-add-row { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px dashed var(--border); background: none; color: var(--muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: 6px; }
+    .btn-add-row:hover { border-color: var(--primary); color: var(--primary); }
 
-    /* README */
-    .readme-toolbar { display:flex; gap:4px; flex-wrap:wrap; padding:10px 12px; background:var(--bg2); border:1px solid var(--border); border-bottom:none; border-radius:10px 10px 0 0; }
-    .md-btn { padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:none; color:var(--muted); font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
-    .md-btn:hover { background:var(--border); color:var(--text); }
-    .readme-tabs { display:flex; border-bottom:1px solid var(--border); background:var(--bg2); padding:0 12px; }
-    .readme-tab { padding:8px 16px; border:none; background:none; color:var(--muted); font-size:0.82rem; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; }
-    .readme-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
-    #readmeEditor { width:100%; min-height:300px; background:var(--bg2); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:16px; color:var(--text); font-family:'Courier New',monospace; font-size:0.87rem; line-height:1.7; resize:vertical; outline:none; transition:border-color 0.2s; }
-    #readmeEditor:focus { border-color:var(--accent); }
-    #readmePreview { display:none; min-height:300px; background:var(--bg2); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:20px 24px; color:var(--text); font-size:0.9rem; line-height:1.8; }
-    #readmePreview h1,#readmePreview h2,#readmePreview h3 { font-family:var(--font-head); font-weight:700; margin:18px 0 8px; }
-    #readmePreview h1 { font-size:1.5rem; }
-    #readmePreview h2 { font-size:1.15rem; border-bottom:1px solid var(--border); padding-bottom:6px; }
-    #readmePreview code { background:var(--border); padding:2px 6px; border-radius:4px; font-size:0.85em; font-family:monospace; }
-    #readmePreview pre { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; overflow-x:auto; margin:10px 0; }
-    #readmePreview pre code { background:none; padding:0; }
-    #readmePreview ul,#readmePreview ol { padding-left:20px; margin-bottom:10px; }
-    #readmePreview li { margin-bottom:3px; }
-    #readmePreview strong { font-weight:600; }
-    #readmePreview blockquote { border-left:3px solid var(--accent); padding-left:14px; color:var(--muted); margin:10px 0; }
+    .readme-toolbar { display: flex; gap: 4px; flex-wrap: wrap; padding: 10px 12px; background: var(--bg-soft); border: 1px solid var(--border); border-bottom: none; border-radius: 10px 10px 0 0; }
+    .md-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); color: var(--muted); font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .md-btn:hover { background: var(--bg-soft); color: var(--ink); }
+    .readme-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-soft); padding: 0 12px; }
+    .readme-tab { padding: 8px 16px; border: none; background: none; color: var(--muted); font-size: 0.82rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .readme-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    #readmeEditor { width: 100%; min-height: 300px; background: var(--white); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; padding: 16px; color: var(--ink); font-family: 'SF Mono', 'Courier New', monospace; font-size: 0.87rem; line-height: 1.7; resize: vertical; outline: none; transition: border-color 0.15s; }
+    #readmeEditor:focus { border-color: var(--primary); }
+    #readmePreview { display: none; min-height: 300px; background: var(--white); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; padding: 20px 24px; color: var(--ink); font-size: 0.9rem; line-height: 1.8; }
+    #readmePreview h1,#readmePreview h2,#readmePreview h3 { font-family: var(--font-head); font-weight: 700; margin: 18px 0 8px; }
+    #readmePreview h2 { border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    #readmePreview code { background: var(--bg-soft); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-family: monospace; }
+    #readmePreview pre { background: #0F172A; border-radius: 8px; padding: 14px; overflow-x: auto; margin: 10px 0; color: #E2E8F0; }
+    #readmePreview pre code { background: none; padding: 0; color: inherit; }
+    #readmePreview ul,#readmePreview ol { padding-left: 20px; margin-bottom: 10px; }
+    #readmePreview blockquote { border-left: 3px solid var(--primary); padding-left: 14px; color: var(--muted); margin: 10px 0; }
 
-    /* Nav */
-    .panel-nav { display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
-    .btn-back { display:flex; align-items:center; gap:6px; padding:11px 20px; border-radius:10px; border:1px solid var(--border); background:none; color:var(--muted); font-size:0.9rem; cursor:pointer; transition:all 0.2s; }
-    .btn-back:hover { border-color:var(--text); color:var(--text); }
-    .btn-next { display:flex; align-items:center; gap:6px; padding:11px 24px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border:none; color:#fff; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
-    .btn-next:hover { opacity:0.9; transform:translateY(-1px); }
-    .btn-submit { display:flex; align-items:center; gap:8px; padding:12px 28px; border-radius:10px; background:linear-gradient(135deg,var(--success),#059669); border:none; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
-    .btn-submit:hover { opacity:0.9; transform:translateY(-1px); box-shadow:0 6px 20px rgba(16,185,129,0.3); }
-    .btn-submit:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .panel-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .btn-back { display: flex; align-items: center; gap: 6px; padding: 11px 20px; border-radius: 10px; border: 1px solid var(--border); background: var(--white); color: var(--muted); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .btn-back:hover { border-color: var(--ink); color: var(--ink); }
+    .btn-next { display: flex; align-items: center; gap: 6px; padding: 11px 24px; border-radius: 10px; background: var(--primary); border: none; color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .btn-next:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-submit { display: flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 10px; background: var(--success); border: none; color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .btn-submit:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(22,163,74,0.25); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    /* Progress */
-    .upload-progress { display:none; margin-top:14px; }
-    .upload-progress.show { display:block; }
-    .progress-bar-bg { height:5px; background:var(--border); border-radius:99px; overflow:hidden; margin-bottom:6px; }
-    .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; width:0%; transition:width 0.3s; }
-    .progress-label { font-size:0.76rem; color:var(--muted); }
+    .upload-progress { display: none; margin-top: 14px; }
+    .upload-progress.show { display: block; }
+    .progress-bar-bg { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 6px; }
+    .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 99px; width: 0%; transition: width 0.3s; }
+    .progress-label { font-size: 0.76rem; color: var(--muted); font-weight: 600; }
 
-    @media (max-width:768px) {
-      .main-wrap { grid-template-columns:1fr; }
-      aside { display:none; }
-      .content { padding:24px 16px; }
-      .image-grid { grid-template-columns:1fr 1fr; }
-      .req-row.three-col,.col-headers.three-col { grid-template-columns:1fr 1fr auto; }
+    @media (max-width: 900px) {
+      .req-row.three-col, .col-headers.three-col { grid-template-columns: 1fr 1fr auto; }
+    }
+    @media (max-width: 768px) {
+      .image-grid { grid-template-columns: 1fr 1fr; }
+      .req-row.three-col, .col-headers.three-col { grid-template-columns: 1fr auto; }
     }
   </style>
 </head>
 <body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
   <div class="page-wrap">
-    <nav>
-      <a href="/" class="nav-logo"><span></span>UniPortal</a>
+    <nav class="topnav">
+      <a href="/" class="nav-logo"><span>🎓</span>UniPortal</a>
       <div class="nav-links">
-        <a href="/projects">Browse Projects</a>
+        <a href="/projects">Projects</a>
+        <a href="/projects/upload" class="active">Upload Project</a>
+        <a href="/profile">My Profile</a>
         <button class="btn-nav-primary" onclick="logout()">Sign Out</button>
       </div>
     </nav>
-    <div class="main-wrap">
-      <aside>
-        <div style="margin-bottom:28px;">
-          <p class="sidebar-label">Navigation</p>
-          <a href="/projects" class="sidebar-link"><span>📁</span> All Projects</a>
-          <a href="/projects/upload" class="sidebar-link active"><span>⬆️</span> Upload Project</a>
-        </div>
-        <div>
-          <p class="sidebar-label">Account</p>
-          <a href="#" class="sidebar-link" onclick="logout();return false;"><span>🚪</span> Sign Out</a>
-        </div>
-      </aside>
 
-      <main class="content">
-        <div class="page-header fade-up">
-          <h1>Submit Your Project</h1>
-          <p>Complete all three sections — images, requirements, and a README guide.</p>
-        </div>
+    <main class="shell">
+      <div class="page-header fade-up">
+        <h1>Submit Your Project</h1>
+        <p>Complete all three sections — images, requirements, and a README guide.</p>
+      </div>
 
-        <!-- Checklist -->
-        <div class="checklist fade-up delay-1">
-          <div class="check-item" id="chk-info"><div class="check-dot"></div><span class="check-text">Project Info</span></div>
-          <div class="check-item" id="chk-images"><div class="check-dot"></div><span class="check-text">Result Images</span></div>
-          <div class="check-item" id="chk-req"><div class="check-dot"></div><span class="check-text">Requirements</span></div>
-          <div class="check-item" id="chk-readme"><div class="check-dot"></div><span class="check-text">README</span></div>
-        </div>
+      <div class="checklist fade-up delay-1">
+        <div class="check-item" id="chk-info"><div class="check-dot"></div><span class="check-text">Project Info</span></div>
+        <div class="check-item" id="chk-images"><div class="check-dot"></div><span class="check-text">Result Images</span></div>
+        <div class="check-item" id="chk-req"><div class="check-dot"></div><span class="check-text">Requirements</span></div>
+        <div class="check-item" id="chk-readme"><div class="check-dot"></div><span class="check-text">README</span></div>
+      </div>
 
-        <!-- Steps -->
-        <div class="steps fade-up delay-1">
-          <div class="step active" id="step-1" onclick="goToStep(1)">
-            <div class="step-num" id="sn-1">1</div>
-            <div><div class="step-label">Step 1</div><div class="step-title">Images</div></div>
-          </div>
-          <div class="step-connector"></div>
-          <div class="step" id="step-2" onclick="goToStep(2)">
-            <div class="step-num" id="sn-2">2</div>
-            <div><div class="step-label">Step 2</div><div class="step-title">Requirements</div></div>
-          </div>
-          <div class="step-connector"></div>
-          <div class="step" id="step-3" onclick="goToStep(3)">
-            <div class="step-num" id="sn-3">3</div>
-            <div><div class="step-label">Step 3</div><div class="step-title">README</div></div>
-          </div>
+      <div class="steps fade-up delay-1">
+        <div class="step active" id="step-1" onclick="goToStep(1)">
+          <div class="step-num" id="sn-1">1</div>
+          <div><div class="step-label">Step 1</div><div class="step-title">Images</div></div>
         </div>
+        <div class="step-connector"></div>
+        <div class="step" id="step-2" onclick="goToStep(2)">
+          <div class="step-num" id="sn-2">2</div>
+          <div><div class="step-label">Step 2</div><div class="step-title">Requirements</div></div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step" id="step-3" onclick="goToStep(3)">
+          <div class="step-num" id="sn-3">3</div>
+          <div><div class="step-label">Step 3</div><div class="step-title">README</div></div>
+        </div>
+      </div>
 
-        <!-- Project title always visible -->
-        <div class="title-card fade-up delay-2">
-          <div class="form-group" style="margin:0;">
-            <label for="projectTitle">Project Title *</label>
-            <input type="text" id="projectTitle" placeholder="e.g. IoT Smart Campus Monitoring System" maxlength="200" oninput="updateChecklist()" />
-          </div>
+      <div class="title-card fade-up delay-2">
+        <div class="form-group" style="margin:0;">
+          <label for="projectTitle">Project Title *</label>
+          <input type="text" id="projectTitle" placeholder="e.g. IoT Smart Campus Monitoring System" maxlength="200" oninput="updateChecklist()" />
+        </div>
+      </div>
+
+      <!-- PANEL 1 — IMAGES -->
+      <div class="panel active" id="panel-1">
+        <div class="panel-header">
+          <div class="panel-icon blue">🖼</div>
+          <div><h2>Result Images</h2><p>Screenshots, hardware output photos, or website captures.</p></div>
         </div>
 
-        <!-- ══ PANEL 1 — IMAGES ══ -->
-        <div class="panel active" id="panel-1">
-          <div class="panel-header">
-            <div class="panel-icon blue">🖼</div>
-            <div><h2>Result Images</h2><p>Upload screenshots, hardware output photos, or website captures.</p></div>
+        <div class="section-card">
+          <h3>🏆 Final Result / Output</h3>
+          <div class="image-grid" id="grid-final">
+            <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+            <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+            <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
           </div>
-
-          <div class="section-card">
-            <h3>🏆 Final Result / Output</h3>
-            <div class="image-grid" id="grid-final">
-              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
-              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
-              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">📸</span><span class="slot-label">Final Result</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
-            </div>
-            <button class="add-more-btn" onclick="addSlot('grid-final','Final Result')">+ Add more</button>
-          </div>
-
-          <div class="section-card">
-            <h3>✅ Proven / Testing Result</h3>
-            <div class="image-grid" id="grid-proven">
-              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">🧪</span><span class="slot-label">Test / Proof</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
-              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">🧪</span><span class="slot-label">Test / Proof</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
-            </div>
-            <button class="add-more-btn" onclick="addSlot('grid-proven','Test / Proof')">+ Add more</button>
-          </div>
-
-          <div class="section-card">
-            <h3>🌐 Website / UI Screenshot</h3>
-            <div class="image-grid" id="grid-web">
-              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">💻</span><span class="slot-label">Website / UI</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
-              <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">💻</span><span class="slot-label">Website / UI</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
-            </div>
-            <button class="add-more-btn" onclick="addSlot('grid-web','Website / UI')">+ Add more</button>
-          </div>
-
-          <div class="panel-nav">
-            <div></div>
-            <button class="btn-next" onclick="goToStep(2)">Next: Requirements →</button>
-          </div>
+          <button class="add-more-btn" onclick="addSlot('grid-final','Final Result')">+ Add more</button>
         </div>
 
-        <!-- ══ PANEL 2 — REQUIREMENTS ══ -->
-        <div class="panel" id="panel-2">
-          <div class="panel-header">
-            <div class="panel-icon green">⚙️</div>
-            <div><h2>Requirements</h2><p>All software, hardware, and networking components needed to run this project.</p></div>
+        <div class="section-card">
+          <h3>✅ Proven / Testing Result</h3>
+          <div class="image-grid" id="grid-proven">
+            <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">🧪</span><span class="slot-label">Test / Proof</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+            <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">🧪</span><span class="slot-label">Test / Proof</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
           </div>
+          <button class="add-more-btn" onclick="addSlot('grid-proven','Test / Proof')">+ Add more</button>
+        </div>
 
-          <div class="section-card">
-            <h3>💻 Software Requirements</h3>
-            <div class="form-group">
-              <label>Programming Language(s)</label>
-              <div class="tag-input-wrap" id="w-lang" onclick="document.getElementById('i-lang').focus()">
-                <input class="tag-real-input" id="i-lang" placeholder="e.g. Python, JavaScript — press Enter" onkeydown="tagKey(event,'w-lang')">
-              </div>
-              <p class="tag-hint">Press Enter or comma after each item.</p>
-            </div>
-            <div class="form-group">
-              <label>Framework / Library</label>
-              <div class="tag-input-wrap" id="w-fw" onclick="document.getElementById('i-fw').focus()">
-                <input class="tag-real-input" id="i-fw" placeholder="e.g. Django, React, Express" onkeydown="tagKey(event,'w-fw')">
-              </div>
-              <p class="tag-hint">Press Enter or comma after each item.</p>
-            </div>
-            <div class="form-group">
-              <label>Database Engine</label>
-              <div class="tag-input-wrap" id="w-db" onclick="document.getElementById('i-db').focus()">
-                <input class="tag-real-input" id="i-db" placeholder="e.g. MySQL, MongoDB, PostgreSQL" onkeydown="tagKey(event,'w-db')">
-              </div>
-              <p class="tag-hint">Press Enter or comma after each item.</p>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Other Tools / Services</label>
-              <div class="tag-input-wrap" id="w-other" onclick="document.getElementById('i-other').focus()">
-                <input class="tag-real-input" id="i-other" placeholder="e.g. Docker, Nginx, AWS EC2" onkeydown="tagKey(event,'w-other')">
-              </div>
-              <p class="tag-hint">Press Enter or comma after each item.</p>
-            </div>
+        <div class="section-card">
+          <h3>🌐 Website / UI Screenshot</h3>
+          <div class="image-grid" id="grid-web">
+            <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">💻</span><span class="slot-label">Website / UI</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
+            <div class="img-slot"><input type="file" accept="image/*" onchange="previewImg(this)"><span class="slot-icon">💻</span><span class="slot-label">Website / UI</span><button class="img-remove" onclick="removeImg(event,this)">x</button></div>
           </div>
+          <button class="add-more-btn" onclick="addSlot('grid-web','Website / UI')">+ Add more</button>
+        </div>
 
-          <div class="section-card">
-            <h3>🔧 Hardware Requirements</h3>
-            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Microcontrollers, sensors, speakers, LEDs, breadboards and other physical components.</p>
-            <div class="col-headers three-col">
-              <span>Category</span><span>Component Name</span><span>Qty / Spec</span><span></span>
+        <div class="panel-nav">
+          <div></div>
+          <button class="btn-next" onclick="goToStep(2)">Next: Requirements →</button>
+        </div>
+      </div>
+
+      <!-- PANEL 2 — REQUIREMENTS -->
+      <div class="panel" id="panel-2">
+        <div class="panel-header">
+          <div class="panel-icon green">⚙️</div>
+          <div><h2>Requirements</h2><p>All software, hardware, and networking components needed to run this project.</p></div>
+        </div>
+
+        <div class="section-card">
+          <h3>💻 Software Requirements</h3>
+          <div class="form-group">
+            <label>Programming Language(s)</label>
+            <div class="tag-input-wrap" id="w-lang" onclick="document.getElementById('i-lang').focus()">
+              <input class="tag-real-input" id="i-lang" placeholder="e.g. Python, JavaScript — press Enter" onkeydown="tagKey(event,'w-lang')">
             </div>
-            <div id="hw-rows">
-              <div class="req-row three-col">
-                <select><option value="">Category</option><option>Arduino</option><option>Raspberry Pi</option><option>Sensor</option><option>Speaker / Audio</option><option>LED / Light</option><option>Breadboard</option><option>Display</option><option>Camera</option><option>Other</option></select>
-                <input type="text" placeholder="e.g. Arduino Uno">
-                <input type="text" placeholder="e.g. x1">
-                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
-              </div>
-              <div class="req-row three-col">
-                <select><option value="">Category</option><option>Arduino</option><option>Raspberry Pi</option><option>Sensor</option><option>Speaker / Audio</option><option>LED / Light</option><option>Breadboard</option><option>Display</option><option>Camera</option><option>Other</option></select>
-                <input type="text" placeholder="e.g. Speaker Blackboard">
-                <input type="text" placeholder="e.g. x2">
-                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
-              </div>
-            </div>
-            <button class="btn-add-row" onclick="addHwRow()">+ Add hardware component</button>
+            <p class="tag-hint">Press Enter or comma after each item.</p>
           </div>
-
-          <div class="section-card">
-            <h3>🌐 Networking Requirements</h3>
-            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Switches, routers, servers, computers, and other network equipment.</p>
-            <div class="col-headers three-col">
-              <span>Category</span><span>Device Name</span><span>Qty / Spec</span><span></span>
+          <div class="form-group">
+            <label>Framework / Library</label>
+            <div class="tag-input-wrap" id="w-fw" onclick="document.getElementById('i-fw').focus()">
+              <input class="tag-real-input" id="i-fw" placeholder="e.g. Django, React, Express" onkeydown="tagKey(event,'w-fw')">
             </div>
-            <div id="net-rows">
-              <div class="req-row three-col">
-                <select><option value="">Category</option><option>Switch</option><option>Layer 3 Switch</option><option>Router</option><option>Access Point</option><option>Server</option><option>Computer / PC</option><option>Firewall</option><option>Other</option></select>
-                <input type="text" placeholder="e.g. Switch S9600">
-                <input type="text" placeholder="e.g. x1">
-                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
-              </div>
-              <div class="req-row three-col">
-                <select><option value="">Category</option><option>Switch</option><option>Layer 3 Switch</option><option>Router</option><option>Access Point</option><option>Server</option><option>Computer / PC</option><option>Firewall</option><option>Other</option></select>
-                <input type="text" placeholder="e.g. Computer">
-                <input type="text" placeholder="e.g. x3">
-                <button class="btn-remove-row" onclick="removeRow(this)">x</button>
-              </div>
-            </div>
-            <button class="btn-add-row" onclick="addNetRow()">+ Add network device</button>
+            <p class="tag-hint">Press Enter or comma after each item.</p>
           </div>
-
-          <div class="panel-nav">
-            <button class="btn-back" onclick="goToStep(1)">← Back</button>
-            <button class="btn-next" onclick="goToStep(3)">Next: README →</button>
+          <div class="form-group">
+            <label>Database Engine</label>
+            <div class="tag-input-wrap" id="w-db" onclick="document.getElementById('i-db').focus()">
+              <input class="tag-real-input" id="i-db" placeholder="e.g. MySQL, MongoDB, PostgreSQL" onkeydown="tagKey(event,'w-db')">
+            </div>
+            <p class="tag-hint">Press Enter or comma after each item.</p>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Other Tools / Services</label>
+            <div class="tag-input-wrap" id="w-other" onclick="document.getElementById('i-other').focus()">
+              <input class="tag-real-input" id="i-other" placeholder="e.g. Docker, Nginx, AWS EC2" onkeydown="tagKey(event,'w-other')">
+            </div>
+            <p class="tag-hint">Press Enter or comma after each item.</p>
           </div>
         </div>
 
-        <!-- ══ PANEL 3 — README ══ -->
-        <div class="panel" id="panel-3">
-          <div class="panel-header">
-            <div class="panel-icon amber">📖</div>
-            <div><h2>README — Step-by-Step Guide</h2><p>Write a walkthrough so others can replicate or deploy your project.</p></div>
-          </div>
-
-          <div class="section-card" style="padding:0;overflow:hidden;">
-            <div class="readme-toolbar">
-              <button class="md-btn" onclick="md('# ','')">H1</button>
-              <button class="md-btn" onclick="md('## ','')">H2</button>
-              <button class="md-btn" onclick="md('### ','')">H3</button>
-              <button class="md-btn" onclick="md('**','**')">B</button>
-              <button class="md-btn" onclick="md('*','*')">I</button>
-              <button class="md-btn" onclick="md('`','`')">Code</button>
-              <button class="md-btn" onclick="md('\n```\n','\n```')">Block</button>
-              <button class="md-btn" onclick="md('- ','')">List</button>
-              <button class="md-btn" onclick="md('1. ','')">1.</button>
-              <button class="md-btn" onclick="insertTemplate()">Template</button>
+        <div class="section-card">
+          <h3>🔧 Hardware Requirements</h3>
+          <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Microcontrollers, sensors, speakers, LEDs, breadboards and other physical components.</p>
+          <div class="col-headers three-col"><span>Category</span><span>Component Name</span><span>Qty / Spec</span><span></span></div>
+          <div id="hw-rows">
+            <div class="req-row three-col">
+              <select><option value="">Category</option><option>Arduino</option><option>Raspberry Pi</option><option>Sensor</option><option>Speaker / Audio</option><option>LED / Light</option><option>Breadboard</option><option>Display</option><option>Camera</option><option>Other</option></select>
+              <input type="text" placeholder="e.g. Arduino Uno">
+              <input type="text" placeholder="e.g. x1">
+              <button class="btn-remove-row" onclick="removeRow(this)">x</button>
             </div>
-            <div class="readme-tabs">
-              <button class="readme-tab active" id="tab-write"   onclick="readmeTab('write')">Write</button>
-              <button class="readme-tab"         id="tab-preview" onclick="readmeTab('preview')">Preview</button>
+            <div class="req-row three-col">
+              <select><option value="">Category</option><option>Arduino</option><option>Raspberry Pi</option><option>Sensor</option><option>Speaker / Audio</option><option>LED / Light</option><option>Breadboard</option><option>Display</option><option>Camera</option><option>Other</option></select>
+              <input type="text" placeholder="e.g. Speaker Blackboard">
+              <input type="text" placeholder="e.g. x2">
+              <button class="btn-remove-row" onclick="removeRow(this)">x</button>
             </div>
-            <textarea id="readmeEditor" placeholder="Write your step-by-step guide here..." oninput="updateChecklist()"></textarea>
-            <div id="readmePreview"></div>
           </div>
-
-          <div class="alert alert-error"   id="errorAlert"   style="margin-top:16px;display:none;"><span>!</span><span id="errorMsg"></span></div>
-          <div class="alert alert-success" id="successAlert" style="margin-top:16px;display:none;"><span>✓</span><span>Project submitted! Pending faculty review.</span></div>
-          <div class="upload-progress" id="uploadProgress">
-            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
-            <p class="progress-label" id="progressLabel">Uploading...</p>
-          </div>
-
-          <div class="panel-nav">
-            <button class="btn-back" onclick="goToStep(2)">← Back</button>
-            <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">Submit Project</button>
-          </div>
+          <button class="btn-add-row" onclick="addHwRow()">+ Add hardware component</button>
         </div>
-      </main>
-    </div>
+
+        <div class="section-card">
+          <h3>🌐 Networking Requirements</h3>
+          <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Switches, routers, servers, computers, and other network equipment.</p>
+          <div class="col-headers three-col"><span>Category</span><span>Device Name</span><span>Qty / Spec</span><span></span></div>
+          <div id="net-rows">
+            <div class="req-row three-col">
+              <select><option value="">Category</option><option>Switch</option><option>Layer 3 Switch</option><option>Router</option><option>Access Point</option><option>Server</option><option>Computer / PC</option><option>Firewall</option><option>Other</option></select>
+              <input type="text" placeholder="e.g. Switch S9600">
+              <input type="text" placeholder="e.g. x1">
+              <button class="btn-remove-row" onclick="removeRow(this)">x</button>
+            </div>
+            <div class="req-row three-col">
+              <select><option value="">Category</option><option>Switch</option><option>Layer 3 Switch</option><option>Router</option><option>Access Point</option><option>Server</option><option>Computer / PC</option><option>Firewall</option><option>Other</option></select>
+              <input type="text" placeholder="e.g. Computer">
+              <input type="text" placeholder="e.g. x3">
+              <button class="btn-remove-row" onclick="removeRow(this)">x</button>
+            </div>
+          </div>
+          <button class="btn-add-row" onclick="addNetRow()">+ Add network device</button>
+        </div>
+
+        <div class="panel-nav">
+          <button class="btn-back" onclick="goToStep(1)">← Back</button>
+          <button class="btn-next" onclick="goToStep(3)">Next: README →</button>
+        </div>
+      </div>
+
+      <!-- PANEL 3 — README -->
+      <div class="panel" id="panel-3">
+        <div class="panel-header">
+          <div class="panel-icon amber">📖</div>
+          <div><h2>README — Step-by-Step Guide</h2><p>Write a walkthrough so others can replicate or deploy your project.</p></div>
+        </div>
+
+        <div class="section-card" style="padding:0;overflow:hidden;">
+          <div class="readme-toolbar">
+            <button class="md-btn" onclick="md('# ','')">H1</button>
+            <button class="md-btn" onclick="md('## ','')">H2</button>
+            <button class="md-btn" onclick="md('### ','')">H3</button>
+            <button class="md-btn" onclick="md('**','**')">B</button>
+            <button class="md-btn" onclick="md('*','*')">I</button>
+            <button class="md-btn" onclick="md('`','`')">Code</button>
+            <button class="md-btn" onclick="md('\n```\n','\n```')">Block</button>
+            <button class="md-btn" onclick="md('- ','')">List</button>
+            <button class="md-btn" onclick="md('1. ','')">1.</button>
+            <button class="md-btn" onclick="insertTemplate()">Template</button>
+          </div>
+          <div class="readme-tabs">
+            <button class="readme-tab active" id="tab-write"   onclick="readmeTab('write')">Write</button>
+            <button class="readme-tab"         id="tab-preview" onclick="readmeTab('preview')">Preview</button>
+          </div>
+          <textarea id="readmeEditor" placeholder="Write your step-by-step guide here..." oninput="updateChecklist()"></textarea>
+          <div id="readmePreview"></div>
+        </div>
+
+        <div class="alert alert-error"   id="errorAlert"   style="margin-top:16px;display:none;"><span>⚠</span><span id="errorMsg"></span></div>
+        <div class="alert alert-success" id="successAlert" style="margin-top:16px;display:none;"><span>✓</span><span>Project submitted! Pending faculty review.</span></div>
+        <div class="upload-progress" id="uploadProgress">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+          <p class="progress-label" id="progressLabel">Uploading...</p>
+        </div>
+
+        <div class="panel-nav">
+          <button class="btn-back" onclick="goToStep(2)">← Back</button>
+          <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">🚀 Submit Project</button>
+        </div>
+      </div>
+    </main>
   </div>
 
 <script>
 function goToStep(n) {
   for (var i = 1; i < n; i++) {
     document.getElementById('step-'+i).classList.add('done');
-    document.getElementById('sn-'+i).textContent = 'v';
+    document.getElementById('sn-'+i).textContent = '✓';
   }
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
@@ -480,7 +439,7 @@ function md(before, after) {
 }
 function insertTemplate() {
   document.getElementById('readmeEditor').value =
-'# Project Title\n\n## Overview\nBrief description of what this project does.\n\n## Prerequisites\nList everything needed before starting.\n\n## Software Setup\n\n### Step 1 — Clone the Repository\n```bash\ngit clone https://github.com/your-repo.git\ncd your-project\n```\n\n### Step 2 — Install Dependencies\n```bash\nnpm install\n```\n\n### Step 3 — Configure Environment\n```bash\ncp .env.example .env\n# Fill in your credentials\n```\n\n### Step 4 — Run the Application\n```bash\nnpm start\n```\n\n## Hardware Setup\n1. Connect the Arduino Uno to your computer via USB\n2. Upload the firmware using Arduino IDE\n3. Wire the LED and speaker per the circuit diagram\n\n## Networking Setup\n1. Configure the S9600 switch with the provided config\n2. Assign static IPs as per the network topology\n\n## Usage\nExplain how to use the project after setup.\n\n## Troubleshooting\nCommon issues and fixes.\n';
+'# Project Title\n\n## Overview\nBrief description of what this project does.\n\n## Prerequisites\nList everything needed before starting.\n\n## Software Setup\n\n### Step 1 — Clone the Repository\n```bash\ngit clone https://github.com/your-repo.git\ncd your-project\n```\n\n### Step 2 — Install Dependencies\n```bash\nnpm install\n```\n\n### Step 3 — Configure Environment\n```bash\ncp .env.example .env\n```\n\n### Step 4 — Run the Application\n```bash\nnpm start\n```\n\n## Hardware Setup\n1. Connect the Arduino Uno to your computer via USB\n2. Upload the firmware using Arduino IDE\n3. Wire the LED and speaker per the circuit diagram\n\n## Networking Setup\n1. Configure the S9600 switch with the provided config\n2. Assign static IPs as per the network topology\n\n## Usage\nExplain how to use the project after setup.\n\n## Troubleshooting\nCommon issues and fixes.\n';
   updateChecklist();
 }
 function readmeTab(tab) {

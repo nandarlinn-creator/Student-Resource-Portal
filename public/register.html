@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register — Student Resource Portal</title>
+  <title>Register — UniPortal</title>
   <link rel="stylesheet" href="/css/style.css" />
   <style>
     .auth-wrap {
@@ -11,120 +11,72 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 60px 24px;
+      padding: 56px 24px;
+      background: var(--bg);
     }
 
     .register-card {
       width: 100%;
-      max-width: 520px;
-      background: var(--card);
+      max-width: 540px;
+      background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 18px;
       padding: 48px;
+      box-shadow: var(--shadow-md);
     }
 
-    .auth-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent2);
-      margin-bottom: 10px;
-    }
-
+    .auth-eyebrow { font-size: 0.85rem; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
     .auth-title {
       font-family: var(--font-head);
-      font-size: 2.2rem;
+      font-size: 2.1rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
       margin-bottom: 8px;
-      line-height: 1.15;
+      color: var(--ink);
     }
+    .auth-sub { color: var(--muted); font-size: 0.92rem; margin-bottom: 32px; }
 
-    .auth-sub {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 36px;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
     .password-wrap { position: relative; }
-    .password-wrap input { padding-right: 48px; }
+    .password-wrap input { padding-right: 46px; }
     .toggle-pw {
-      position: absolute;
-      right: 14px; top: 50%;
-      transform: translateY(-50%);
-      background: none; border: none;
-      cursor: pointer; color: var(--muted);
-      padding: 4px; font-size: 1.1rem;
-      transition: color 0.2s;
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--muted-light);
+      padding: 4px; font-size: 1.05rem; transition: color 0.15s;
     }
-    .toggle-pw:hover { color: var(--text); }
+    .toggle-pw:hover { color: var(--muted); }
 
-    /* Password strength */
-    .pw-strength {
-      margin-top: 8px;
-      display: flex;
-      gap: 4px;
-    }
-    .pw-bar {
-      flex: 1; height: 3px;
-      background: var(--border);
-      border-radius: 99px;
-      transition: background 0.3s;
-    }
+    .pw-strength { margin-top: 8px; display: flex; gap: 4px; }
+    .pw-bar { flex: 1; height: 3px; background: var(--border); border-radius: 99px; transition: background 0.3s; }
     .pw-bar.weak   { background: var(--danger); }
     .pw-bar.medium { background: var(--warning); }
     .pw-bar.strong { background: var(--success); }
-    .pw-hint { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+    .pw-hint { font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
 
     .role-select { appearance: none; cursor: pointer; }
 
     .terms {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 24px;
-      font-size: 0.85rem;
-      color: var(--muted);
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 24px; font-size: 0.85rem; color: var(--muted);
     }
-    .terms input[type="checkbox"] {
-      width: 16px; height: 16px;
-      min-width: 16px;
-      margin-top: 2px;
-      accent-color: var(--accent);
-    }
-    .terms a { color: var(--accent); text-decoration: none; }
+    .terms input[type="checkbox"] { width: 16px; height: 16px; min-width: 16px; margin-top: 2px; accent-color: var(--primary); }
+    .terms a { color: var(--primary); text-decoration: none; font-weight: 600; }
 
-    .login-cta {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 0.875rem;
-      color: var(--muted);
-    }
-    .login-cta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .login-cta { text-align: center; margin-top: 22px; font-size: 0.88rem; color: var(--muted); }
+    .login-cta a { color: var(--primary); text-decoration: none; font-weight: 600; }
 
     @media (max-width: 560px) {
       .two-col { grid-template-columns: 1fr; }
       .register-card { padding: 32px 24px; }
-      .auth-title { font-size: 1.75rem; }
+      .auth-title { font-size: 1.7rem; }
     }
   </style>
 </head>
 <body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
   <div class="page-wrap">
-    <nav>
-      <a href="/" class="nav-logo">
-        <span></span>UniPortal
-      </a>
+    <nav class="topnav">
+      <a href="/" class="nav-logo"><span>🎓</span>UniPortal</a>
       <div class="nav-links">
         <a href="/auth/login">Sign In</a>
       </div>
@@ -132,7 +84,7 @@
 
     <div class="auth-wrap">
       <div class="register-card fade-up">
-        <p class="auth-eyebrow">Create account</p>
+        <p class="auth-eyebrow">CREATE ACCOUNT</p>
         <h1 class="auth-title">Join the Portal</h1>
         <p class="auth-sub">Start sharing and discovering university projects.</p>
 
@@ -187,7 +139,7 @@
 
         <div class="terms">
           <input type="checkbox" id="terms" />
-          <label for="terms" style="text-transform:none;font-size:0.85rem;letter-spacing:0;">
+          <label for="terms" style="font-size:0.85rem;font-weight:400;margin:0;">
             I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
           </label>
         </div>

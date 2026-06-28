@@ -27,6 +27,14 @@ const User = sequelize.define("User", {
     type: DataTypes.ENUM("student", "faculty", "admin"),
     defaultValue: "student",
   },
+  phone: {
+    type: DataTypes.STRING(30),
+    allowNull: true,
+  },
+  address: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+  },
 });
 
 // ─── Instance Methods ──────────────────────────────────────────

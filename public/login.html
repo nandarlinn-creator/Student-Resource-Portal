@@ -3,100 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login — Student Resource Portal</title>
+  <title>Sign In — UniPortal</title>
   <link rel="stylesheet" href="/css/style.css" />
   <style>
     .auth-wrap {
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      min-height: calc(100vh - 69px);
+      min-height: calc(100vh - 65px);
     }
 
-    /* ── Left panel ── */
+    /* ── Left panel (form) ── */
     .auth-panel {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 60px;
-      border-right: 1px solid var(--border);
+      padding: 64px;
+      background: var(--white);
     }
 
     .auth-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 10px;
     }
 
     .auth-title {
       font-family: var(--font-head);
-      font-size: 2.8rem;
+      font-size: 2.4rem;
       font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--ink);
       margin-bottom: 12px;
     }
 
     .auth-sub {
       color: var(--muted);
       font-size: 1rem;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
       line-height: 1.6;
     }
 
-    .auth-form { max-width: 380px; }
+    .auth-form { max-width: 400px; }
 
     .password-wrap { position: relative; }
-    .password-wrap input { padding-right: 48px; }
+    .password-wrap input { padding-right: 46px; }
     .toggle-pw {
       position: absolute;
-      right: 14px; top: 50%;
+      right: 12px; top: 50%;
       transform: translateY(-50%);
       background: none; border: none;
-      cursor: pointer; color: var(--muted);
-      padding: 4px; font-size: 1.1rem;
-      transition: color 0.2s;
+      cursor: pointer; color: var(--muted-light);
+      padding: 4px; font-size: 1.05rem;
+      transition: color 0.15s;
     }
-    .toggle-pw:hover { color: var(--text); }
+    .toggle-pw:hover { color: var(--muted); }
 
     .forgot-link {
       display: block;
       text-align: right;
-      font-size: 0.8rem;
-      color: var(--muted);
+      font-size: 0.84rem;
+      color: var(--primary);
       text-decoration: none;
-      margin-top: -12px;
-      margin-bottom: 20px;
-      transition: color 0.2s;
+      margin-top: -10px;
+      margin-bottom: 22px;
+      font-weight: 600;
     }
-    .forgot-link:hover { color: var(--accent); }
+    .forgot-link:hover { text-decoration: underline; }
 
     .register-cta {
       text-align: center;
-      margin-top: 24px;
-      font-size: 0.875rem;
+      margin-top: 22px;
+      font-size: 0.88rem;
       color: var(--muted);
     }
-    .register-cta a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .register-cta a { color: var(--primary); text-decoration: none; font-weight: 600; }
     .register-cta a:hover { text-decoration: underline; }
 
-    /* ── Right panel ── */
+    /* ── Right panel (visual / collage) ── */
     .auth-visual {
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 60px;
+      padding: 64px;
       background: var(--bg);
-      gap: 32px;
+      gap: 36px;
       overflow: hidden;
     }
 
-    /* ── Background photo collage (atmosphere only, not literal preview) ── */
+    /* Soft decorative wave shapes, echoing the mockup's bottom curve */
+    .auth-visual::before {
+      content: '';
+      position: absolute;
+      bottom: -120px; left: -10%;
+      width: 120%; height: 280px;
+      background: linear-gradient(180deg, rgba(37,99,235,0.06), rgba(37,99,235,0.13));
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      z-index: 0;
+    }
+
     .collage-bg {
       position: absolute;
       inset: 0;
@@ -109,20 +118,20 @@
     .collage-bg .tile {
       width: 100%; height: 100%;
       overflow: hidden;
-      background: var(--bg2);
+      background: var(--border);
     }
     .collage-bg .tile img {
       width: 100%; height: 100%;
       object-fit: cover;
       display: block;
-      filter: saturate(0.7) brightness(0.55);
+      filter: saturate(0.5) brightness(1.05);
       transform: scale(1.05);
     }
     .collage-overlay {
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse at center, rgba(10,14,26,0.55) 0%, rgba(10,14,26,0.88) 70%, rgba(10,14,26,0.97) 100%);
+        radial-gradient(ellipse at center, rgba(241,245,249,0.55) 0%, rgba(241,245,249,0.90) 70%, rgba(241,245,249,0.98) 100%);
       z-index: 1;
     }
     .auth-visual > .stat-grid,
@@ -136,72 +145,68 @@
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       width: 100%;
-      max-width: 340px;
+      max-width: 360px;
     }
 
     .stat-card {
-      background: var(--bg2);
+      background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
     }
 
     .stat-card .num {
       font-family: var(--font-head);
       font-size: 2rem;
       font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary);
     }
 
     .stat-card .lbl {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: var(--muted);
       margin-top: 4px;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .visual-quote {
-      max-width: 340px;
+      max-width: 360px;
       text-align: center;
     }
 
     .visual-quote blockquote {
       font-family: var(--font-head);
-      font-size: 1.1rem;
-      font-weight: 600;
+      font-size: 1.15rem;
+      font-weight: 700;
       line-height: 1.5;
-      color: var(--text);
-      margin-bottom: 12px;
+      color: var(--ink);
+      margin-bottom: 10px;
     }
 
     .visual-quote cite {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--muted);
       font-style: normal;
+      font-weight: 500;
     }
 
     @media (max-width: 768px) {
       .auth-wrap { grid-template-columns: 1fr; }
       .auth-visual { display: none; }
       .auth-panel { padding: 40px 24px; }
-      .auth-title { font-size: 2rem; }
+      .auth-title { font-size: 1.9rem; }
     }
   </style>
 </head>
 <body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
   <div class="page-wrap">
-    <nav>
+    <nav class="topnav">
       <a href="/" class="nav-logo">
-        <span></span>UniPortal
+        <span>🎓</span>UniPortal
       </a>
       <div class="nav-links">
-        <a href="/auth/register" class="btn-nav-primary">Register</a>
+        <a href="/auth/register" class="btn-nav-outline">Register</a>
       </div>
     </nav>
 
@@ -209,7 +214,7 @@
       <!-- Form Panel -->
       <div class="auth-panel">
         <div class="auth-form fade-up">
-          <p class="auth-eyebrow">Welcome back</p>
+          <p class="auth-eyebrow">WELCOME BACK</p>
           <h1 class="auth-title">Sign in to<br>your portal</h1>
           <p class="auth-sub">Access your projects, resources, and university tools.</p>
 
@@ -245,9 +250,7 @@
 
       <!-- Visual Panel -->
       <div class="auth-visual">
-        <div class="collage-bg" id="collageBg">
-          <!-- Populated by JS with real approved project images, tiled and dimmed -->
-        </div>
+        <div class="collage-bg" id="collageBg"></div>
         <div class="collage-overlay"></div>
 
         <div class="stat-grid">
@@ -270,7 +273,6 @@
 
   <script src="/js/auth.js"></script>
   <script>
-    // Pull real, live counts — no placeholder numbers
     fetch('/auth/public-stats', { headers: { 'Accept': 'application/json' } })
       .then(res => res.json())
       .then(data => {
@@ -282,39 +284,28 @@
         document.getElementById('statContributors').textContent = '0';
       });
 
-    // Build a tiled background collage from real project images — atmosphere only,
-    // heavily dimmed/blurred via CSS so it never reads as a literal content preview.
     fetch('/auth/public-preview', { headers: { 'Accept': 'application/json' } })
       .then(res => res.json())
       .then(data => {
         const collage = document.getElementById('collageBg');
         const projects = data.projects || [];
 
-        // Gather every available image across all returned projects
         let allImages = [];
         projects.forEach(p => {
           if (Array.isArray(p.images)) allImages = allImages.concat(p.images);
         });
 
-        if (allImages.length === 0) {
-          collage.style.display = 'none';
-          return;
-        }
+        if (allImages.length === 0) { collage.style.display = 'none'; return; }
 
-        // Fill a fixed number of tiles, repeating images if there aren't enough
         const TILE_COUNT = 8;
         const tiles = [];
-        for (let i = 0; i < TILE_COUNT; i++) {
-          tiles.push(allImages[i % allImages.length]);
-        }
+        for (let i = 0; i < TILE_COUNT; i++) tiles.push(allImages[i % allImages.length]);
 
         collage.innerHTML = tiles.map(src =>
           `<div class="tile"><img src="${src}" alt="" loading="lazy" onerror="this.parentElement.remove()" /></div>`
         ).join('');
       })
-      .catch(() => {
-        document.getElementById('collageBg').style.display = 'none';
-      });
+      .catch(() => { document.getElementById('collageBg').style.display = 'none'; });
   </script>
 </body>
 </html>
